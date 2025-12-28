@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import './seedData.service.dart';
+import 'seedData.service.dart';
 
 class DataBaseService {
   static final DataBaseService _instance = DataBaseService._internal();
@@ -108,5 +108,4 @@ class DataBaseService {
       )
     ''');
   }
-
 }

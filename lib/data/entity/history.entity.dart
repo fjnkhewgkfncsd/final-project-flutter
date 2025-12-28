@@ -1,13 +1,13 @@
-class History {
+class HistoryEntity {
   final int id;
   final int quizId;
 
-  const History({
+  const HistoryEntity({
     required this.id,
     required this.quizId,
   });
-  factory History.fromMap(Map<String, dynamic> map) {
-    return History(
+  factory HistoryEntity.fromMap(Map<String, dynamic> map) {
+    return HistoryEntity(
       id: map['id'],
       quizId: map['quizId'],
     );

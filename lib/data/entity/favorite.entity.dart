@@ -1,13 +1,13 @@
-class Favorite {
+class FavoriteEntity {
   final int id;
   final int historyId;
 
-  const Favorite({
+  const FavoriteEntity({
     required this.id,
     required this.historyId,
   });
-  factory Favorite.fromMap(Map<String, dynamic> map) {
-    return Favorite(
+  factory FavoriteEntity.fromMap(Map<String, dynamic> map) {
+    return FavoriteEntity(
       id: map['id'],
       historyId: map['historyId'],
     );

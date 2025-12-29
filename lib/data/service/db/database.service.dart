@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import './seedData.service.dart';
+import 'seedData.service.dart';
 
 class DataBaseService {
   static final DataBaseService _instance = DataBaseService._internal();
@@ -62,7 +62,7 @@ class DataBaseService {
       CREATE TABLE emergencyAction(
         emergencyActionId INTEGER PRIMARY KEY AUTOINCREMENT,
         actionTitle TEXT,
-        actionDescription TEXT,
+        instruction TEXT,
         LevelOfDanger TEXT CHECK(LevelOfDanger IN ('Low', 'Medium', 'High'))
       )
     ''');
@@ -96,6 +96,7 @@ class DataBaseService {
       CREATE TABLE history(
         historyId INTEGER PRIMARY KEY AUTOINCREMENT,
         quizId INTEGER,
+        timestamp current_timestamp,
         FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE,
       )
     ''');
@@ -108,5 +109,4 @@ class DataBaseService {
       )
     ''');
   }
-
 }

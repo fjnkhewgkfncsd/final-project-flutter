@@ -62,7 +62,7 @@ class DataBaseService {
       CREATE TABLE emergencyAction(
         emergencyActionId INTEGER PRIMARY KEY AUTOINCREMENT,
         actionTitle TEXT,
-        actionDescription TEXT,
+        instruction TEXT,
         LevelOfDanger TEXT CHECK(LevelOfDanger IN ('Low', 'Medium', 'High'))
       )
     ''');

@@ -4,7 +4,7 @@ import '../../entity/answer.entity.dart';
 class QuestionController {
   final DataBaseService _databaseService = DataBaseService();
 
-  Future<List<QuestionEntity>> getQuestionsWithAnswers(int quizId) async {
+  Future<List<QuestionEntity>> getQuestionsWithAnswersByQuizId(int quizId) async {
   final db = await _databaseService.database;
 
   final rows = await db.rawQuery(
@@ -41,4 +41,26 @@ class QuestionController {
   return questions.values.toList();
 }
 
+  Future<QuestionEntity?> getQuestionById(int id) async {
+    final db = await _databaseService.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'question',
+      where: 'questionId = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return QuestionEntity.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  Future<List<QuestionEntity>> getQuestionsByQuizId(int quizId) async {
+    final db = await _databaseService.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'question',
+      where: 'quizId = ?',
+      whereArgs: [quizId],
+    );
+    return maps.map((map) => QuestionEntity.fromMap(map)).toList();
+  }
 }

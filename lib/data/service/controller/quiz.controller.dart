@@ -45,4 +45,17 @@ class QuizController {
 
     return QuizEntity.fromMapWithQuestions(rows);
   }
+
+  Future<QuizEntity?> getQuizById(int id) async {
+    final db = await _databaseService.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'quiz',
+      where: 'quizId = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return QuizEntity.fromMap(maps.first);
+    }
+    return null;
+  }
 }

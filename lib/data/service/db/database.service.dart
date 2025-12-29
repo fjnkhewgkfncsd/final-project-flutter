@@ -96,6 +96,7 @@ class DataBaseService {
       CREATE TABLE history(
         historyId INTEGER PRIMARY KEY AUTOINCREMENT,
         quizId INTEGER,
+        timestamp current_timestamp,
         FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE,
       )
     ''');

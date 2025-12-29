@@ -1,4 +1,4 @@
-import '../../entity/Emergency.entity.dart';
+import '../../entity/emergency.entity.dart';
 import '../db/database.service.dart';
 class EmergencyController {
   final DataBaseService _databaseService = DataBaseService();
@@ -6,9 +6,7 @@ class EmergencyController {
   Future<List<EmergencyEntity>> getAllEmergency() async {
     final db = await _databaseService.database;
     final List<Map<String, dynamic>> maps = await db.query('emergency');
-    return List.generate(maps.length, (i) {
-      return EmergencyEntity.fromMap(maps[i]);
-    });
+    return maps.map((map) => EmergencyEntity.fromMap(map)).toList();
   }
   
   Future<EmergencyEntity?> getEmergencyById(int id) async {

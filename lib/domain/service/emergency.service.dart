@@ -1,5 +1,5 @@
 import '../interface/Irepository.interface.dart';
-import '../model/emergncy.model.dart';
+import '../model/emergency.model.dart';
 
 class EmergencyService {
   final IEmergencyRepo _emergencyRepo;

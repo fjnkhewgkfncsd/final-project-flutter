@@ -1,7 +1,7 @@
 import '../model/answer.model.dart';
 import '../model/question.model.dart';
 import '../model/emergencyAction.model.dart';
-import '../model/emergncy.model.dart';
+import '../model/emergency.model.dart';
 import '../model/favorite.model.dart';
 import '../model/history.model.dart';
 import '../model/quiz.model.dart';
@@ -31,10 +31,13 @@ abstract class IEmergencyActionRepo extends Irepository<EmergencyAction, int> {
 }
 
 abstract class IQuizRepo extends Irepository<Quiz, int> {
+  Future<Quiz?> getQuizByEmergencyId(int emergencyId);
+  Future<Quiz?> getQuizWithQuestionsAndAnswers(int emergencyId);
 }
 
 abstract class IQuestionRepo extends Irepository<Question, int> {
   Future<List<Question>> getQuestionsByQuizId(int quizId);
+  Future<List<Question>> getQuestionsWithAnswersByQuizId(int quizId);
 }
 
 abstract class IAnswerRepo extends Irepository<Answer, int> {
@@ -43,5 +46,5 @@ abstract class IAnswerRepo extends Irepository<Answer, int> {
 
 abstract class IUserAnswerRepo extends Irepository<UserAnswer, int> {
   Future<List<UserAnswer>> getUserAnswersByHistoryId(int historyId);
-  Future<int> insertUserAnswer(UserAnswer userAnswer);
+  Future<void> insertUserAnswer(UserAnswer userAnswer);
 }

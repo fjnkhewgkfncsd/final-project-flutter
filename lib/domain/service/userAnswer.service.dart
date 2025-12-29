@@ -13,7 +13,7 @@ class UserAnswerService {
   Future<List<UserAnswer>> getUserAnswersByQuizAttemptId(int historyId) async {
     return await _userAnswerRepo.getUserAnswersByHistoryId(historyId);
   }
-  Future<int> insertUserAnswer(UserAnswer userAnswer) async {
-    return await _userAnswerRepo.insertUserAnswer(userAnswer);
+  Future<void> insertUserAnswer(UserAnswer userAnswer) async {
+    await _userAnswerRepo.insertUserAnswer(userAnswer);
   }
 }

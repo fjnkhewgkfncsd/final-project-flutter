@@ -9,4 +9,12 @@ class QuizService {
   Future<Quiz?> getQuizById(int id) async {
     return await _quizRepo.getById(id);
   }
+
+  Future<Quiz?> getQuizByEmergencyId(int emergencyId) async {
+    return await _quizRepo.getQuizByEmergencyId(emergencyId);
+  }
+
+  Future<Quiz?> getQuizWithQuestionsAndAnswers(int emergencyId) async {
+    return await _quizRepo.getQuizWithQuestionsAndAnswers(emergencyId);
+  }
 }

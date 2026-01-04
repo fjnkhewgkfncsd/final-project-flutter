@@ -6,7 +6,8 @@ class EmergencyMapper{
     return Emergency(
       id: entity.id,
       name: entity.name,
-      image: entity.image,
+      icon: entity.icon,
+      categoryId: entity.categoryId,
     );
   }
 
@@ -14,7 +15,8 @@ class EmergencyMapper{
     return EmergencyEntity(
       id: domain.id,
       name: domain.name,
-      image: domain.image,
+      icon: domain.icon,
+      categoryId: domain.categoryId,
     );
   }
 }

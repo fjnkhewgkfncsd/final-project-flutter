@@ -9,8 +9,8 @@ class QuestionEntity {
     required this.questionId,
     required this.questionTitle,
     required this.quizId,
-    this.answers = const [],
-  });
+    List<AnswerEntity>? answers,
+  }) : answers = answers ?? [];
 
   factory QuestionEntity.fromMap(Map<String, dynamic> map) {
     return QuestionEntity(

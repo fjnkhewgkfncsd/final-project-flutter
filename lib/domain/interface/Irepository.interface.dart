@@ -6,6 +6,9 @@ import '../model/favorite.model.dart';
 import '../model/history.model.dart';
 import '../model/quiz.model.dart';
 import '../model/userAnswer.model.dart';
+import '../model/category.model.dart';
+import '../model/historyView.model.dart';
+import '../model/emergencyView.model.dart';
 
 abstract class Irepository<T, Id>{
   Future<T?> getById(Id id);
@@ -13,8 +16,13 @@ abstract class Irepository<T, Id>{
 
 abstract class IHistoryRepo extends Irepository<History, int> {
   Future<List<History>> getAllHistories();
-  Future<int> insertHistory(History history);
+  Future<int> insertHistory(int quizId);
   Future<int> deleteHistory(int id);
+  Future<List<HistoryViewModel>> getAllHistoryViews();
+}
+
+abstract class ICategoryRepo extends Irepository<Category, int> {
+  Future<List<Category>> getAllCategories();
 }
 
 abstract class IFavoriteRepo extends Irepository<Favorite, int> {
@@ -25,6 +33,8 @@ abstract class IFavoriteRepo extends Irepository<Favorite, int> {
 
 abstract class IEmergencyRepo extends Irepository<Emergency, int> {
   Future<List<Emergency>> getAllEmergencies();
+  Future<List<Emergency>> getEmergenciesByCategoryId(int categoryId);
+  Future<List<EmergencyViewModel>> getAllEmergencyViews();
 }
 
 abstract class IEmergencyActionRepo extends Irepository<EmergencyAction, int> {

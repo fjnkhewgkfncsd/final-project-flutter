@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:project/domain/model/emergencyView.model.dart';
 import '../tab/favorite_Tab.dart';
-import '../tab/history_Tab.dart';
+// import '../tab/history_Tab.dart';
 import '../tab/home_Tab.dart';
 import '../../ui/screen/search_Emergency.dart';
 import '../../animations/search_transition_Animation.dart';
+import '../../domain/model/emergency.model.dart';
+import '../../domain/service/emergency.service.dart';
+import '../../domain/service/history.service.dart';
+import '../../domain/service/favorite.service.dart';
+import '../../domain/model/history.model.dart';
+import '../screen/start_Screen.dart';
+import '../../domain/model/historyView.model.dart';
+import '../../domain/model/favorite.model.dart';
+import '../../data/repo/emergency.repo.dart';
+import '../../data/repo/history.repo.dart';
+import '../../data/repo/favorite.repo.dart';
+import '../../domain/service/category.service.dart';
+import '../../data/repo/category.repo.dart';
+import '../../domain/model/category.model.dart';
+import '../widget/appButtonNavigation.widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,24 +29,57 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = true;
   int _currentIndex = 0;
+  late final EmergencyService _emergencyService ;
+  late final HistoryService _historyService ;
+  late final FavoriteService _favoriteService ;
+  late final CategoryService _categoryService ;
 
-  final List<Widget> _tabs = [
-    const HomeTab(),
-    const FavoriteTab(),
-    // const HistoryTab(),
-  ];
+  late List<HistoryViewModel> _histories;
+  late List<Favorite> _favorites;
+  late List<EmergencyViewModel> _emergencies;
+  late List<Category> _categories;
+
+  @override
+  void initState() {
+    super.initState();
+    _emergencyService = EmergencyService(EmergencyRepoImpl());
+    _historyService = HistoryService(HistoryRepoImpl());
+    _favoriteService = FavoriteService(FavoriteRepoImpl());
+    _categoryService = CategoryService(CategoryRepoImpl());
+    _loadData();
+    
+  }
+
+  Future<void> _loadData() async {
+    _emergencies = await _emergencyService.getAllEmergencyViews();
+    _histories = await _historyService.getAllHistoryViews();
+    _favorites = await _favoriteService.getFavorites();
+    _categories = await _categoryService.getAllCategories();
+    setState((){
+      isLoading = false;
+    });
+  }
 
   void _navigateToSearch() {
     Navigator.of(context).push(
       SearchTransition.createRoute(
-        const SearchEmergencyScreen(),
+        SearchEmergencyScreen(emergencies: _emergencies),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    if(isLoading){
+      return StartScreen();
+    }
+    final List<Widget> tabs = [
+    HomeTab(categories:_categories, emergencies:_emergencies),
+    FavoriteTab(favorites: _favorites,histories:_histories),
+    FavoriteTab(tabName: 'history',histories: _histories,),
+  ];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
@@ -82,52 +131,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        child: _tabs[_currentIndex],
+        child: tabs[_currentIndex],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              spreadRadius: 0,
-              offset: const Offset(0, -1),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          backgroundColor: Colors.white,
-          elevation: 8,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_outline),
-              activeIcon: Icon(Icons.favorite),
-              label: 'Favorites',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history_outlined),
-              activeIcon: Icon(Icons.history),
-              label: 'History',
-            ),
-          ],
-          selectedItemColor: Colors.red,
-          unselectedItemColor: Colors.grey[600],
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
-          showUnselectedLabels: true,
-          type: BottomNavigationBarType.fixed,
-        ),
+      bottomNavigationBar: AppBottomNavigation(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }

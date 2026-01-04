@@ -23,17 +23,18 @@ class QuizController {
       '''
       SELECT
         qz.quizId,
+        qz.startQuestion,
         qz.emergencyId,
         q.questionId,
         q.questionTitle,
         a.answerId,
-        a.answerText,
+        a.answerTitle, 
         a.nextQuestionId,
         ea.*
       FROM quiz qz
-      JOIN question q ON qz.quizId = q.quizId
-      JOIN answer a ON q.questionId = a.questionId
-      JOIN emergencyAction ea on a.emergencyActionId = ea.emergencyActionId
+      LEFT JOIN question q ON qz.quizId = q.quizId
+      LEFT JOIN answer a ON q.questionId = a.questionId
+      LEFT JOIN emergencyAction ea on a.emergencyActionId = ea.emergencyActionId
       WHERE qz.emergencyId = ?
       ''',
       [emergencyId],

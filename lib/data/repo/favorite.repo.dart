@@ -3,7 +3,7 @@ import '../../domain/interface/Irepository.interface.dart';
 import '../service/controller/favorite.controller.dart';
 import '../../domain/model/favorite.model.dart';
 
-class FavoriteRepoImple implements IFavoriteRepo{
+class FavoriteRepoImpl implements IFavoriteRepo{
   final FavoriteService _favoriteService = FavoriteService();
 
   @override

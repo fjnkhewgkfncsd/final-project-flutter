@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-class Emergency {
+class EmergencyViewModel {
   final int id;
   final String name;
   final IconData icon;
   final int categoryId;
+  final String categoryName;
 
-  const Emergency({
+  const EmergencyViewModel({
     required this.id,
     required this.name,
     required this.icon,
     required this.categoryId,
+    required this.categoryName,
   });
 }

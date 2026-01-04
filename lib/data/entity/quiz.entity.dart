@@ -4,10 +4,12 @@ class QuizEntity{
   final int id;
   final int emergencyId;
   final List<QuestionEntity> questions;
+  final int startQuestionId;
 
   const QuizEntity({
     required this.id,
     required this.emergencyId,
+    required this.startQuestionId,
     this.questions = const [],
   });
 
@@ -15,6 +17,7 @@ class QuizEntity{
     return QuizEntity(
       id: map['quizId'] as int,
       emergencyId: map['emergencyId'] as int,
+      startQuestionId: map['startQuestionId'] as int,
       questions: [],
     );
   }
@@ -38,6 +41,7 @@ class QuizEntity{
 
   return QuizEntity(
     id: rows.first['quizId'] as int,
+    startQuestionId: rows.first['startQuestion'] as int,
     emergencyId: rows.first['emergencyId'] as int,
     questions: questions.values.toList(),
   );

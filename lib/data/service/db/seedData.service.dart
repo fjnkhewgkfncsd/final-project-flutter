@@ -3,9 +3,29 @@ class SeedData {
 
   Future<void> seedInitialData(Database database) async {
     final db = database;
+
+    final categories = [
+      'environmental',
+      'injuries',
+      'Breathing Emergencies',
+      'Heart and Medical',
+      'Poisoning',
+      'Pediatric',
+      'Other'
+    ];
+
+    final Map<String,int> categoryIds = {};
+
+    for(final category in categories){
+      final id = await db.insert('category',{
+        "categoryName": category
+      });
+      categoryIds[category] = id;
+    }
     final emergencyId = await db.insert('emergency', {
       'emergencyName': 'Fire',
-      'emergencyImage': 'fire_image.png',
+      'emergencyIcon': 'fire_truck',
+      'categoryId' : categoryIds['environmental'],
     });
     final quizId = await db.insert('quiz',{
       'emergencyId': emergencyId,
@@ -49,42 +69,47 @@ class SeedData {
         final questionId = await db.insert('question', question);
         questionIds.add(questionId);
       }
+      await db.update('quiz', {
+        'startQuestion': questionIds[0]},
+        where: "quizId = ?",
+        whereArgs: [quizId]
+        );
       List<int> emergencyActionIds = [];
       final List<Map<String, dynamic>> emergencyActions = 
       [
         {
           'actionTitle': 'Basement Fire Risk',
-          'actionDescription':
+          'instruction':
               'Basements fill with smoke quickly. Stay low, block smoke with cloth, and signal for help immediately. Call emergency services if possible.',
           'LevelOfDanger': 'High',
         },
         {
           'actionTitle': 'Injured and Cannot Move',
-          'actionDescription':
+          'instruction':
               'Do not attempt to move if it is unsafe. Stay low, protect your airway from smoke, and call emergency services. Signal your location if possible.',
           'LevelOfDanger': 'High',
         },
         {
           'actionTitle': 'Others Need Assistance',
-          'actionDescription':
+          'instruction':
               'If safe, assist others to move together. If not safe, call emergency services immediately and report their location.',
           'LevelOfDanger': 'Medium',
         },
         {
           'actionTitle': 'Exit Safely',
-          'actionDescription':
+          'instruction':
               'Leave the building immediately using the stairs. Move to a safe open area away from the building and wait for help.',
           'LevelOfDanger': 'Low',
         },
         {
           'actionTitle': 'Signal from Window or Balcony',
-          'actionDescription':
+          'instruction':
               'Go to the window or balcony, close doors behind you, block smoke, and signal for help. Do not jump unless instructed by rescuers.',
           'LevelOfDanger': 'High',
         },
         {
           'actionTitle': 'No Safe Escape',
-          'actionDescription':
+          'instruction':
               'Stay in the safest room available. Seal doors with cloth to block smoke, stay low, and signal for help. Call emergency services immediately.',
           'LevelOfDanger': 'High',
         },

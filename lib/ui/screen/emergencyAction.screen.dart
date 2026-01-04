@@ -5,10 +5,18 @@ import '../screen/home_Screen.dart';
 import '../../domain/service/favorite.service.dart';
 import '../../data/repo/favorite.repo.dart';
 import '../../domain/model/favorite.model.dart';
+import '../../data/repo/answer.repo.dart';
+import '../../domain/service/answer.service.dart';
+import '../../data/repo/userAnswer.repo.dart';
+import '../../domain/service/userAnswer.service.dart';
+import '../../domain/model/answer.model.dart';
+import '../../domain/model/userAnswer.model.dart';
+
+
 class EmergencyActionScreen extends StatefulWidget {
   final int historyId;
-  final EmergencyAction emergency;
-  const EmergencyActionScreen({super.key, required this.historyId, required this.emergency});
+  EmergencyAction? emergency;
+  EmergencyActionScreen({super.key, required this.historyId,this.emergency});
 
   @override
   State<EmergencyActionScreen> createState() => _EmergencyActionScreenState();
@@ -16,7 +24,54 @@ class EmergencyActionScreen extends StatefulWidget {
 
 class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
   final FavoriteService _favoriteService = FavoriteService(FavoriteRepoImpl());
+  final AnswerService _answerService = AnswerService(AnswerRepoImpl());
+  final UserAnswerService _userAnswerService = UserAnswerService(UserAnswerRepoImpl());
+
   bool isFav = false;
+  List<Answer> answers = [];
+  List<UserAnswer> userAnswers = [];
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if(widget.emergency == null) {
+      _loadAnswers().then((_) {
+        setState(() {
+          widget.emergency = getEmergencyAction();
+        });
+      });
+    }
+  }
+
+  Future<void> _loadAnswers() async {
+    setState((){
+      isLoading = true;
+    });
+    answers = await _answerService.getAnswersByHistoryId(widget.historyId);
+    userAnswers = await _userAnswerService.getAllUserAnswersByHistoryId(widget.historyId);
+    setState((){
+      isLoading = false;
+    });
+  }
+
+  EmergencyAction getEmergencyAction(){
+    for(var userAnswer in userAnswers){
+      for(var answer in answers){
+        if(answer.answerId == userAnswer.answerId){
+          if(answer.emergencyAction != null){
+            return answer.emergencyAction!;
+          }
+        }
+      }
+    }
+    return EmergencyAction(
+      id: 0,
+      actionTitle: 'No Action Found',
+      instruction: 'No Instruction Available',
+      level: 'Unknown',
+    );
+  }
 
   Color getLevelColor(String level) {
     switch (level.toLowerCase()) {
@@ -60,6 +115,13 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if(isLoading){
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Emergency Actions'),
@@ -74,7 +136,7 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
                 SizedBox(height: 40),
                 Center(
                   child: Text(
-                    widget.emergency.actionTitle,
+                    widget.emergency!.actionTitle,
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -84,13 +146,13 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
                     width:200,
                     height:70,
                     decoration: BoxDecoration(
-                      color: getLevelColor(widget.emergency.level),
+                      color: getLevelColor(widget.emergency!.level),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Text(
-                        'Level: ${widget.emergency.level}',
+                        'Level: ${widget.emergency!.level}',
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -101,7 +163,7 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
-                    widget.emergency.instruction,
+                    widget.emergency!.instruction,
                     style: const TextStyle(fontSize: 19),
                   ),
                 ),

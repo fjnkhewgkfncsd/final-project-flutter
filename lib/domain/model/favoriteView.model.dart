@@ -1,6 +1,6 @@
-import './emergency.entity.dart';
 import 'package:flutter/material.dart';
-class FavoriteViewEntity{
+
+class FavoriteViewModel{
   final int id;
   final int historyId;
   final IconData icon;
@@ -8,7 +8,7 @@ class FavoriteViewEntity{
   final DateTime timestamp;
   final String category;
 
-  const FavoriteViewEntity({
+  const FavoriteViewModel({
     required this.id,
     required this.historyId,
     required this.icon,
@@ -17,11 +17,11 @@ class FavoriteViewEntity{
     required this.category,
   });
 
-  factory FavoriteViewEntity.fromMap(Map<String, dynamic> map) {
-    return FavoriteViewEntity(
+  factory FavoriteViewModel.fromMap(Map<String, dynamic> map) {
+    return FavoriteViewModel(
       id: map['id'],
       historyId: map['historyId'],
-      icon: EmergencyEntity.toIconData(map['emergencyIcon']),
+      icon: map['emergencyIcon'],
       title: map['emergencyName'],
       timestamp: DateTime.parse(map['timestamp']),
       category: map['categoryName'],

@@ -9,6 +9,7 @@ import '../model/userAnswer.model.dart';
 import '../model/category.model.dart';
 import '../model/historyView.model.dart';
 import '../model/emergencyView.model.dart';
+import '../model/favoriteView.model.dart';
 
 abstract class Irepository<T, Id>{
   Future<T?> getById(Id id);
@@ -29,6 +30,7 @@ abstract class IFavoriteRepo extends Irepository<Favorite, int> {
   Future<List<Favorite>> getAllFavorites();
   Future<int> insertFavorite(Favorite favorite);
   Future<int> deleteFavorite(int id);
+  Future<List<FavoriteViewModel>> getFavoriteViews();
 }
 
 abstract class IEmergencyRepo extends Irepository<Emergency, int> {
@@ -52,9 +54,11 @@ abstract class IQuestionRepo extends Irepository<Question, int> {
 
 abstract class IAnswerRepo extends Irepository<Answer, int> {
   Future<List<Answer>> getAnswersByQuestionId(int questionId);
+  Future<List<Answer>> getAnswersByHistoryId(int historyId);
 }
 
 abstract class IUserAnswerRepo extends Irepository<UserAnswer, int> {
   Future<List<UserAnswer>> getUserAnswersByHistoryId(int historyId);
   Future<void> insertUserAnswer(UserAnswer userAnswer);
+  Future<List<UserAnswer>> getAllUserAnswersByHistoryId(int historyId);
 }

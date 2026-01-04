@@ -1,5 +1,5 @@
 class FavoriteEntity {
-  final int id;
+  final int? id;
   final int historyId;
 
   const FavoriteEntity({

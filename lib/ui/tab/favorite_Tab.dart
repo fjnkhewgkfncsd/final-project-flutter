@@ -1,108 +1,99 @@
 import 'package:flutter/material.dart';
-import '../../domain/model/history.model.dart';
-import '../../domain/model/favorite.model.dart';
 import '../../domain/model/historyView.model.dart';
+import '../../domain/model/favorite.model.dart';
+import '../../domain/service/history.service.dart';
+import '../../domain/service/favorite.service.dart';
+import '../../data/repo/history.repo.dart';
+import '../../data/repo/favorite.repo.dart';
+import '../../domain/model/favoriteView.model.dart';
+import '../screen/emergencyAction.screen.dart';
 
 class FavoriteTab extends StatefulWidget {
   final String tabName;
-  final List<Favorite>? favorites;
-  final List<HistoryViewModel>? histories;
-  const FavoriteTab({super.key,this.tabName = 'Favorites', this.favorites, this.histories});
+
+  const FavoriteTab({super.key, this.tabName = 'Favorites'});
+
   @override
   State<FavoriteTab> createState() => _FavoriteTabState();
-
-  List<Object> get content {
-    if(tabName == 'history'){
-      return histories ?? [];
-    }else{
-      return favorites ?? [];
-    }
-  }
 }
+
 class _FavoriteTabState extends State<FavoriteTab> {
-  late List<dynamic> content;
+  final HistoryService _historyService = HistoryService(HistoryRepoImpl());
+  final FavoriteService _favoriteService = FavoriteService(FavoriteRepoImpl());
+
+  List<HistoryViewModel> histories = [];
+  List<FavoriteViewModel> favorites = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    content = List<dynamic>.from(widget.content);
-
+    _loadContent();
   }
 
-  void toggleHeartIconForHistory(History history){
-    setState(() {
-      history.isFav = !history.isFav;
-      for(final favorite in widget.favorites!){
-        if(favorite.historyId == history.id){
-          widget.favorites?.remove(favorite);
-          break;
+  /// Load data from service
+  Future<void> _loadContent() async {
+    setState(() => isLoading = true);
+
+    if (widget.tabName.toLowerCase() == 'history') {
+      histories = await _historyService.getAllHistoryViews();
+      favorites = await _favoriteService.getFavoriteViews();
+      assignFavoritesToHistories();
+    } else {
+      favorites = await _favoriteService.getFavoriteViews();
+    }
+    setState(() => isLoading = false);
+  }
+
+  void assignFavoritesToHistories() {
+    for(var history in histories){
+      for(var favorite in favorites){
+        if(history.id == favorite.historyId){
+          history.isFav = true;
         }
       }
-      
+    }
+  }
+
+  FavoriteViewModel getFavoriteByHistoryId(int historyId) {
+    favorites.firstWhere(
+      (fav) => fav.historyId == historyId,
+    );
+    throw Exception('Favorite not found for historyId: $historyId');
+  }
+  /// Toggle favorite state for history item
+  void toggleFavoriteForHistory(HistoryViewModel history) async {
+    setState(() {
+      history.isFav = !history.isFav;
     });
+    if (history.isFav) {
+      await _favoriteService.addFavorite(Favorite(historyId: history.id));
+    } else {
+      final favorite = getFavoriteByHistoryId(history.id);
+      await _favoriteService.deleteFavorite(favorite.id);
+    }
+
+    // Reload content to update UI
+    await _loadContent();
   }
 
-  IconData getIconDataByHistoryId(int historyId){
-    for(var history in widget.histories!){
-      if(history.id == historyId){
-        return history.icon;
-      }
-    }
-    return Icons.help_outline;
-  }
-
-  HistoryViewModel? getHistoryById(int id){
-    for(var history in widget.histories!){
-      if(history.id == id){
-        return history;
-      }
-    }
-    return null;
-  }
-
-  String get itemQuantityText{
-    if(widget.tabName == 'history'){
-      int itemCount = widget.histories?.length ?? 0;
-      return '$itemCount Lookups';
-    }else{
-      int itemCount = widget.favorites?.length ?? 0;
-      return '$itemCount saved treatments';
-    }
-  }
-  
-  Object get objectType {
-    if(widget.tabName == 'history'){
-      return HistoryViewModel;
-    }else{
-      return Favorite;
-    }
-  }
-
-  Widget getTrailingContent(dynamic content){
-    if(widget.tabName == 'history'){
-      if(content?.isFav){
-        return IconButton(
-          onPressed: () {
-            toggleHeartIconForHistory(content);
-          },
-          icon: const Icon(Icons.favorite, color: Colors.red)
-        );
-      }else{
-        return IconButton(
-          onPressed: () {
-            toggleHeartIconForHistory(content);
-          },
-          icon: const Icon(Icons.favorite_border, color: Colors.red)
-        );
-      }
-    }else{
+  /// Build trailing heart icon
+  Widget getTrailing(dynamic item) {
+    if (widget.tabName.toLowerCase() == 'history') {
+      return IconButton(
+        icon: Icon(
+          item.isFav ? Icons.favorite : Icons.favorite_border
+        ),
+        onPressed: () => toggleFavoriteForHistory(item),
+      );
+    } else {
       return IconButton(
         icon: const Icon(Icons.favorite, color: Colors.red),
-        onPressed: () {
+        onPressed: () async {
           // Remove from favorites
-          setState(() {
-            this.content.remove(content);
-          });
+          await _favoriteService.deleteFavorite(item.id);
+          await _loadContent();
+          print('Removed from favorites');
         },
       );
     }
@@ -110,120 +101,145 @@ class _FavoriteTabState extends State<FavoriteTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: content.isEmpty
-          ? _buildEmptyState()
-          : ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                  child: Text(
-                    'My ${widget.tabName}',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    itemQuantityText,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ...content.map((item) {
-                  if (item is HistoryViewModel) {
-                    return _buildHistoryCard(item);
-                  } else {
-                    return _buildFavoriteCard(item);
-                  }
-                })
-              ],
-            ),
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final content =
+        widget.tabName.toLowerCase() == 'history' ? histories : favorites;
+
+    if (content.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+          child: Text(
+            'My ${widget.tabName}',
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Text(
+            widget.tabName.toLowerCase() == 'history'
+                ? '${histories.length} Lookups'
+                : '${favorites.length} saved treatments',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ),
+        const SizedBox(height: 20),
+        ...content.map((item) {
+          if (item is HistoryViewModel) {
+            return _buildHistoryCard(item);
+          } else {
+            return _buildFavoriteCard(item as FavoriteViewModel);
+          }
+        }),
+      ],
     );
   }
 
-  Widget _buildFavoriteCard(Favorite content) {
-    final history = getHistoryById(content.historyId);
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            getIconDataByHistoryId(content.historyId),
-            color: Colors.red,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          history?.title ?? '',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              history?.category ?? '',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+  Widget _buildHistoryCard(HistoryViewModel history) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to EmergencyActionScreen
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => EmergencyActionScreen(
+              historyId: history.id
             ),
-            Text(
-              history?.timestamp.timeZoneName ?? '',
-              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ListTile(
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
+            child: Icon(history.icon, color: Colors.red, size: 24),
+          ),
+          title: Text(
+            history.title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                history.category,
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              Text(
+                history.timestamp.toLocal().toString().split(' ')[0],
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          trailing: getTrailing(history),
         ),
-        trailing: getTrailingContent(content)
       ),
     );
   }
 
+  Widget _buildFavoriteCard(FavoriteViewModel favorite) {
 
-  Widget _buildHistoryCard(HistoryViewModel content) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            content.icon,
-            color: Colors.red,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          content.title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              content.category,
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+    return GestureDetector(
+      onTap: () {
+        // Navigate to EmergencyActionScreen
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => EmergencyActionScreen(
+              historyId: favorite.historyId
             ),
-            Text(
-              content.timestamp.timeZoneName,
-              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ListTile(
+          leading: Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-          ],
+            child: Icon(favorite.icon,
+                color: Colors.red, size: 24),
+          ),
+          title: Text(
+            favorite.title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                favorite.category,
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              Text(
+                favorite.timestamp.toLocal().toString().split(' ')[0],
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          trailing: getTrailing(favorite),
         ),
-        trailing: getTrailingContent(content)
       ),
     );
   }
@@ -256,8 +272,7 @@ class _FavoriteTabState extends State<FavoriteTab> {
           const SizedBox(height: 30),
           ElevatedButton(
             onPressed: () {
-              // Navigate back to home
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Go back to Home
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

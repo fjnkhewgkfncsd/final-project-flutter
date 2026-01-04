@@ -24,5 +24,11 @@ class UserAnswerRepoImpl implements IUserAnswerRepo {
     return await _userAnswerController.insertUserAnswer(entity);
   }
 
+  @override
+  Future<List<UserAnswer>> getAllUserAnswersByHistoryId(int historyId) async {
+    final results = await _userAnswerController.getAllUserAnswersByHistoryId(historyId);
+    return results.map((entity) => UserAnswerMapper.toDomain(entity)).toList();
+  }
+
 }
 

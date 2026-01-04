@@ -17,4 +17,10 @@ class AnswerRepoImpl implements IAnswerRepo {
     final results = await _answerController.getAnswersByQuestionId(questionId);
     return results.map((entity) => AnswerMapper.toDomain(entity)).toList();
   }
+
+  @override
+  Future<List<Answer>> getAnswersByHistoryId(int historyId) async {
+    final results = await _answerController.getAnswersByHistoryId(historyId);
+    return results.map((entity) => AnswerMapper.toDomain(entity)).toList();
+  }
 }

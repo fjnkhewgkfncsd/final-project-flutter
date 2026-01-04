@@ -10,6 +10,6 @@ class FavoriteMapper {
   }
 
   static FavoriteEntity toEntity(Favorite model){
-    return FavoriteEntity(id: model.id!, historyId: model.historyId);
+    return FavoriteEntity(id: model.id, historyId: model.historyId);
   }
 }

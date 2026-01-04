@@ -77,8 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     final List<Widget> tabs = [
     HomeTab(categories:_categories, emergencies:_emergencies),
-    FavoriteTab(favorites: _favorites,histories:_histories),
-    FavoriteTab(tabName: 'history',histories: _histories,),
+    FavoriteTab(),
+    FavoriteTab(tabName: 'history',),
   ];
     return Scaffold(
       appBar: AppBar(

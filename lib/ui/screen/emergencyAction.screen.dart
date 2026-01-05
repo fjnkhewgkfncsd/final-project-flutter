@@ -125,6 +125,7 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.red,
         title: const Text('Emergency Actions'),
       ),
       body: ListView(

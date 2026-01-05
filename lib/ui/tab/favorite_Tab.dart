@@ -35,8 +35,6 @@ class _FavoriteTabState extends State<FavoriteTab> {
 
   /// Load data from service
   Future<void> _loadContent() async {
-    setState(() => isLoading = true);
-
     if (widget.tabName.toLowerCase() == 'history') {
       histories = await _historyService.getAllHistoryViews();
       favorites = await _favoriteService.getFavoriteViews();
@@ -93,6 +91,10 @@ class _FavoriteTabState extends State<FavoriteTab> {
     await _historyService.deleteHistory(history.id);
   }
 
+  void onRemoveFavorite(FavoriteViewModel favorite) async {
+    await _favoriteService.deleteFavorite(favorite.id);
+  }
+
   /// Build trailing heart icon
   Widget getTrailing(dynamic item) {
     if (widget.tabName.toLowerCase() == 'history') {
@@ -106,7 +108,6 @@ class _FavoriteTabState extends State<FavoriteTab> {
       return IconButton(
         icon: const Icon(Icons.favorite, color: Colors.red),
         onPressed: () async {
-          // Remove from favorites
           await _favoriteService.deleteFavorite(item.id);
           await _loadContent();
         },
@@ -220,50 +221,60 @@ class _FavoriteTabState extends State<FavoriteTab> {
 
   Widget _buildFavoriteCard(FavoriteViewModel favorite) {
 
-    return GestureDetector(
-      onTap: () {
-        // Navigate to EmergencyActionScreen
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => EmergencyActionScreen(
-              historyId: favorite.historyId
-            ),
-          ),
-        );
+    return Dismissible(
+      key: Key('favorite_${favorite.id}'),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        onRemoveFavorite(favorite);
+        setState(() {
+          favorites.removeWhere((f) => f.id == favorite.id);
+        });
       },
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: ListTile(
-          leading: Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to EmergencyActionScreen
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EmergencyActionScreen(
+                historyId: favorite.historyId
+              ),
             ),
-            child: Icon(favorite.icon,
-                color: Colors.red, size: 24),
-          ),
-          title: Text(
-            favorite.title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                favorite.category,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          );
+        },
+        child: Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              Text(
-                favorite.timestamp.toLocal().toString().split(' ')[0],
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-              ),
-            ],
+              child: Icon(favorite.icon,
+                  color: Colors.red, size: 24),
+            ),
+            title: Text(
+              favorite.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  favorite.category,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+                Text(
+                  favorite.timestamp.toLocal().toString().split(' ')[0],
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                ),
+              ],
+            ),
+            trailing: getTrailing(favorite),
           ),
-          trailing: getTrailing(favorite),
         ),
       ),
     );

@@ -16,10 +16,10 @@ class DataBaseService {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'app_database.db');
+    String path = join(await getDatabasesPath(), 'FirstAidBuddyApp_database.db');
     return await openDatabase(
       path,
-      version: 5,
+      version: 4,
       onCreate: (db, version) async {
         await _onCreate(db, version);
         await SeedData().seedInitialData(db);
@@ -119,5 +119,16 @@ class DataBaseService {
         FOREIGN KEY (historyId) REFERENCES history(historyId) ON DELETE CASCADE
       )
     ''');
+
+    await db.execute('CREATE INDEX idx_emergency_category ON emergency(categoryId)');
+    await db.execute('CREATE INDEX idx_quiz_emergency ON quiz(emergencyId)');
+    await db.execute('CREATE INDEX idx_question_quiz ON question(quizId)');
+    await db.execute('CREATE INDEX idx_answer_question ON answer(questionId)');
+    await db.execute('CREATE INDEX idx_answer_action ON answer(emergencyActionId)');
+    await db.execute('CREATE INDEX idx_userAnswer_quiz ON userAnswer(quizId)');
+    await db.execute('CREATE INDEX idx_userAnswer_history ON userAnswer(historyId)');
+    await db.execute('CREATE INDEX idx_userAnswer_answer ON userAnswer(answerId)');
+    await db.execute('CREATE INDEX idx_history_quiz ON history(quizId)');
+    await db.execute('CREATE INDEX idx_favorite_history ON favorite(historyId)');
   }
 }

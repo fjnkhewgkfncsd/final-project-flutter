@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../animations/fade_grid_Animation.dart';
 import '../../domain/model/category.model.dart';
-import '../../domain/model/emergency.model.dart';
 import '../../domain/model/emergencyView.model.dart';
 // Import the QuizScreen
 import '../../ui/screen/quiz_Screen.dart'; // You'll need to create this

@@ -31,6 +31,7 @@ abstract class IFavoriteRepo extends Irepository<Favorite, int> {
   Future<int> insertFavorite(Favorite favorite);
   Future<int> deleteFavorite(int id);
   Future<List<FavoriteViewModel>> getFavoriteViews();
+  Future<int> deleteFavoriteByHistoryId(int historyId);
 }
 
 abstract class IEmergencyRepo extends Irepository<Emergency, int> {

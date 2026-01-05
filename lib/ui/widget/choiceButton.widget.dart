@@ -16,7 +16,7 @@ class ChoiceButton extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           elevation: 2,
-          backgroundColor: Colors.grey,
+          backgroundColor: Colors.red[300],
           minimumSize: const Size.fromHeight(50),
           maximumSize: const Size.fromHeight(100),
         ),

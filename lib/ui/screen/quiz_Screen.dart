@@ -10,7 +10,6 @@ import '../../domain/model/emergencyView.model.dart';
 import '../widget/question.widget.dart';
 import '../../domain/model/question.model.dart';
 
-import '../widget/appButtonNavigation.widget.dart';
 import './emergencyAction.screen.dart';
 
 import '../../data/repo/history.repo.dart';
@@ -35,8 +34,6 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  int _currentIndex = 0;
-
   final List<int> userAnswers = [];
 
   late final QuizService _quizService;
@@ -115,6 +112,7 @@ class _QuizScreenState extends State<QuizScreen> {
         MaterialPageRoute(
           builder: (_) => EmergencyActionScreen(
             historyId: historyId,
+            isFromQuiz: true,
             emergency: selectedAnswer.emergencyAction!,
           ),
         ),
@@ -122,7 +120,6 @@ class _QuizScreenState extends State<QuizScreen> {
       return;
     }
 
-    /// ➡️ NEXT QUESTION
     setState(() {
       currentQuestionId = nextQuestionId;
     });
@@ -143,14 +140,6 @@ class _QuizScreenState extends State<QuizScreen> {
       body: QuestionWidget(
         question: getQuestionById(currentQuestionId),
         returnAnswerId: addUserAnswer,
-      ),
-      bottomNavigationBar: AppBottomNavigation(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
       ),
     );
   }

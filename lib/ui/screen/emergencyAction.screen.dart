@@ -15,8 +15,9 @@ import '../../domain/model/userAnswer.model.dart';
 
 class EmergencyActionScreen extends StatefulWidget {
   final int historyId;
+  final bool isFromQuiz;
   EmergencyAction? emergency;
-  EmergencyActionScreen({super.key, required this.historyId,this.emergency});
+  EmergencyActionScreen({super.key, required this.historyId,this.emergency, this.isFromQuiz = false});
 
   @override
   State<EmergencyActionScreen> createState() => _EmergencyActionScreenState();
@@ -87,7 +88,7 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
   }
 
   Icon getIconFav(){
-    return isFav ? Icon(Icons.favorite, color: Colors.red,) :  Icon(Icons.favorite_border);
+    return isFav ? Icon(Icons.favorite, color: Colors.red,size: 25,) :  Icon(Icons.favorite_border,size: 25,);
   }
 
   void navigateToHome(BuildContext context) {
@@ -167,10 +168,10 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
                     style: const TextStyle(fontSize: 19),
                   ),
                 ),
-                SizedBox(height: 72),
-                CustomizeButton(title:'add to Favorites', onPressed: toggleFavorite, color: Colors.blue, icon: getIconFav(),),
+                if(widget.isFromQuiz) SizedBox(height: 72),
+                if(widget.isFromQuiz) CustomizeButton(title:'add to Favorites', onPressed: toggleFavorite, color: Colors.greenAccent, icon: getIconFav(),),
                 SizedBox(height: 16),
-                CustomizeButton(title:'Back to Home', onPressed:() => navigateToHome(context), color: Colors.blue),
+                CustomizeButton(title:'Back to Home', onPressed:() => navigateToHome(context), color: Colors.green, icon: Icon(Icons.home,size: 25,),), 
               ],
             ),
           )

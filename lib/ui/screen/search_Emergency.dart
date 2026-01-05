@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../animations/search_transition_Animation.dart';
 import '../../domain/model/emergencyView.model.dart';
+import '../screen/quiz_Screen.dart';
 
 class SearchEmergencyScreen extends StatefulWidget {
   final List<EmergencyViewModel> emergencies;
@@ -45,97 +46,8 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
   void _onEmergencyTap(EmergencyViewModel emergency) {
     Navigator.of(context).push(
       SearchTransition.createRoute(
-        Scaffold(
-          appBar: AppBar(
-            title: Text(
-              emergency.name,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            backgroundColor: Colors.red,
-            elevation: 1,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
-          backgroundColor: Colors.grey[50],
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Icon(
-                            emergency.icon,
-                            size: 50,
-                            color: Colors.red,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          emergency.name,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            emergency.categoryName,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Content
-                  const Text(
-                    'First Aid Instructions',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+        QuizScreen(emergency: emergency),
+      )
     );
   }
   

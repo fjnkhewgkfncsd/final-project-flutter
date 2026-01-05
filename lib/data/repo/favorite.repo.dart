@@ -35,4 +35,9 @@ class FavoriteRepoImpl implements IFavoriteRepo{
     final result = await _favoriteService.getFavoriteViews();
     return result.map((e) => FavoriteViewMapper.toDomain(e)).toList();
   }
+
+  @override
+  Future<int> deleteFavoriteByHistoryId(int historyId) async {
+    return await _favoriteService.deleteFavoriteByHistoryId(historyId);
+  }
 }

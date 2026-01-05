@@ -1,7 +1,7 @@
 import 'package:project/data/entity/historyView.entity.dart';
-
 import '../../entity/history.entity.dart';
 import '../db/database.service.dart';
+
 class HistoryController{
   final DataBaseService _databaseService = DataBaseService();
 
@@ -9,7 +9,7 @@ class HistoryController{
     final db = await _databaseService.database;
     final result = await db.query(
       'history',
-      where: 'id = ?',
+      where: 'historyId = ?',
       whereArgs: [id],
     );
     if (result.isNotEmpty) {
@@ -48,7 +48,7 @@ class HistoryController{
     final db = await _databaseService.database;
     return await db.delete(
       'history',
-      where: 'id = ?',
+      where: 'historyId = ?',
       whereArgs: [id],
     );
   }

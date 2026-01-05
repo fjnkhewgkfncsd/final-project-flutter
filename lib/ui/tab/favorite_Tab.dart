@@ -7,11 +7,13 @@ import '../../data/repo/history.repo.dart';
 import '../../data/repo/favorite.repo.dart';
 import '../../domain/model/favoriteView.model.dart';
 import '../screen/emergencyAction.screen.dart';
+import '../screen/home_Screen.dart';
 
 class FavoriteTab extends StatefulWidget {
   final String tabName;
+  final bool isActive;
 
-  const FavoriteTab({super.key, this.tabName = 'Favorites'});
+  const FavoriteTab({super.key, this.tabName = 'Favorites',required this.isActive });
 
   @override
   State<FavoriteTab> createState() => _FavoriteTabState();
@@ -45,6 +47,16 @@ class _FavoriteTabState extends State<FavoriteTab> {
     setState(() => isLoading = false);
   }
 
+  @override
+  void didUpdateWidget(covariant FavoriteTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.isActive && !oldWidget.isActive) {
+      _loadContent();
+    }
+  }
+  
+
   void assignFavoritesToHistories() {
     for(var history in histories){
       for(var favorite in favorites){
@@ -54,6 +66,7 @@ class _FavoriteTabState extends State<FavoriteTab> {
       }
     }
   }
+
 
   FavoriteViewModel getFavoriteByHistoryId(int historyId) {
     favorites.firstWhere(
@@ -67,23 +80,26 @@ class _FavoriteTabState extends State<FavoriteTab> {
       history.isFav = !history.isFav;
     });
     if (history.isFav) {
-      await _favoriteService.addFavorite(Favorite(historyId: history.id));
+      _favoriteService.addFavorite(Favorite(historyId: history.id));
     } else {
-      final favorite = getFavoriteByHistoryId(history.id);
-      await _favoriteService.deleteFavorite(favorite.id);
+      _favoriteService.deleteFavoriteByHistoryId(history.id);
     }
 
     // Reload content to update UI
     await _loadContent();
   }
 
+  void onRemoveHistory(HistoryViewModel history) async {
+    await _historyService.deleteHistory(history.id);
+  }
+
   /// Build trailing heart icon
   Widget getTrailing(dynamic item) {
     if (widget.tabName.toLowerCase() == 'history') {
       return IconButton(
-        icon: Icon(
-          item.isFav ? Icons.favorite : Icons.favorite_border
-        ),
+        icon: item.isFav
+            ? const Icon(Icons.favorite, color: Colors.red)
+            : const Icon(Icons.favorite_border, color: Colors.grey),
         onPressed: () => toggleFavoriteForHistory(item),
       );
     } else {
@@ -93,7 +109,6 @@ class _FavoriteTabState extends State<FavoriteTab> {
           // Remove from favorites
           await _favoriteService.deleteFavorite(item.id);
           await _loadContent();
-          print('Removed from favorites');
         },
       );
     }
@@ -145,49 +160,59 @@ class _FavoriteTabState extends State<FavoriteTab> {
   }
 
   Widget _buildHistoryCard(HistoryViewModel history) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to EmergencyActionScreen
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => EmergencyActionScreen(
-              historyId: history.id
-            ),
-          ),
-        );
+    return Dismissible(
+      key: Key('history_${history.id}'),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) {
+        onRemoveHistory(history);
+        setState(() {
+          histories.removeWhere((h) => h.id == history.id);
+          });
       },
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 12),
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: ListTile(
-          leading: Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to EmergencyActionScreen
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => EmergencyActionScreen(
+                historyId: history.id
+              ),
             ),
-            child: Icon(history.icon, color: Colors.red, size: 24),
-          ),
-          title: Text(
-            history.title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                history.category,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          );
+        },
+        child: Card(
+          margin: const EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              Text(
-                history.timestamp.toLocal().toString().split(' ')[0],
-                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-              ),
-            ],
+              child: Icon(history.icon, color: Colors.red, size: 24),
+            ),
+            title: Text(
+              history.title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  history.category,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+                Text(
+                  history.timestamp.toLocal().toString().split(' ')[0],
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                ),
+              ],
+            ),
+            trailing: getTrailing(history),
           ),
-          trailing: getTrailing(history),
         ),
       ),
     );
@@ -255,16 +280,16 @@ class _FavoriteTabState extends State<FavoriteTab> {
             color: Colors.grey.withOpacity(0.4),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'No favorites yet',
-            style: TextStyle(
+          Text(
+            'No ${widget.tabName} yet',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: Colors.black54,
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
+          if(widget.tabName == 'favorites') const Text(
             'Add treatments to favorites to see them here',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15, color: Colors.grey),
@@ -272,7 +297,12 @@ class _FavoriteTabState extends State<FavoriteTab> {
           const SizedBox(height: 30),
           ElevatedButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Go back to Home
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                ),
+                (route) => false,
+              ); // Go back to Home
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

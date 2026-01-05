@@ -5,14 +5,10 @@ import '../tab/favorite_Tab.dart';
 import '../tab/home_Tab.dart';
 import '../../ui/screen/search_Emergency.dart';
 import '../../animations/search_transition_Animation.dart';
-import '../../domain/model/emergency.model.dart';
 import '../../domain/service/emergency.service.dart';
 import '../../domain/service/history.service.dart';
 import '../../domain/service/favorite.service.dart';
-import '../../domain/model/history.model.dart';
 import '../screen/start_Screen.dart';
-import '../../domain/model/historyView.model.dart';
-import '../../domain/model/favorite.model.dart';
 import '../../data/repo/emergency.repo.dart';
 import '../../data/repo/history.repo.dart';
 import '../../data/repo/favorite.repo.dart';
@@ -31,33 +27,31 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
   int _currentIndex = 0;
-  late final EmergencyService _emergencyService ;
-  late final HistoryService _historyService ;
-  late final FavoriteService _favoriteService ;
-  late final CategoryService _categoryService ;
 
-  late List<HistoryViewModel> _histories;
-  late List<Favorite> _favorites;
+  late final EmergencyService _emergencyService;
+  late final CategoryService _categoryService;
+
   late List<EmergencyViewModel> _emergencies;
   late List<Category> _categories;
+
+  late final FavoriteTab favoriteTab;
+  late final FavoriteTab historyTab;
 
   @override
   void initState() {
     super.initState();
     _emergencyService = EmergencyService(EmergencyRepoImpl());
-    _historyService = HistoryService(HistoryRepoImpl());
-    _favoriteService = FavoriteService(FavoriteRepoImpl());
     _categoryService = CategoryService(CategoryRepoImpl());
+    favoriteTab = FavoriteTab(isActive: _currentIndex == 1,);
+    historyTab = FavoriteTab(tabName: 'history', isActive: _currentIndex == 2); 
     _loadData();
-    
   }
 
   Future<void> _loadData() async {
     _emergencies = await _emergencyService.getAllEmergencyViews();
-    _histories = await _historyService.getAllHistoryViews();
-    _favorites = await _favoriteService.getFavorites();
     _categories = await _categoryService.getAllCategories();
-    setState((){
+
+    setState(() {
       isLoading = false;
     });
   }
@@ -72,20 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if(isLoading){
+    if (isLoading) {
       return StartScreen();
     }
-    final List<Widget> tabs = [
-    HomeTab(categories:_categories, emergencies:_emergencies),
-    FavoriteTab(),
-    FavoriteTab(tabName: 'history',),
-  ];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
         centerTitle: true,
         elevation: 2,
-        title: _currentIndex == 0 
+        title: _currentIndex == 0
             ? GestureDetector(
                 onTap: _navigateToSearch,
                 child: Container(
@@ -94,13 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.95),
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: const Row(
                     children: [
@@ -109,11 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: Text(
                           'Search emergency...',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 15,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Colors.grey, fontSize: 15),
                         ),
                       ),
                     ],
@@ -129,10 +108,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: tabs[_currentIndex],
-      ),
+      body: IndexedStack(
+      index: _currentIndex,
+      children: [
+        HomeTab(
+          key: const PageStorageKey('home'),
+          categories: _categories,
+          emergencies: _emergencies,
+        ),
+        FavoriteTab(
+          key: const PageStorageKey('favorite'),
+          isActive: _currentIndex == 1,
+        ),
+        FavoriteTab(
+          key: const PageStorageKey('history'),
+          tabName: 'history',
+          isActive: _currentIndex == 2,
+        ),
+      ],
+    ),
       bottomNavigationBar: AppBottomNavigation(
         currentIndex: _currentIndex,
         onTap: (index) {

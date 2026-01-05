@@ -40,6 +40,15 @@ class FavoriteService{
     );
   }
 
+  Future<int> deleteFavoriteByHistoryId(int historyId) async {
+    final db = await _databaseService.database;
+    return await db.delete(
+      'favorite',
+      where: 'historyId = ?',
+      whereArgs: [historyId],
+    );
+  }
+
   Future<List<FavoriteViewEntity>> getFavoriteViews()async {
     final db = await _databaseService.database;
     final result = await db.rawQuery('''

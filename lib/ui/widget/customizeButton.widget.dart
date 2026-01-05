@@ -25,7 +25,7 @@ class CustomizeButton extends StatelessWidget {
           icon!,
           const SizedBox(width: 10,),
           Text(title,
-          style:TextStyle(fontSize:18)),
+          style:TextStyle(fontSize:21,fontWeight: FontWeight.w700)),
         ],
       )
     );

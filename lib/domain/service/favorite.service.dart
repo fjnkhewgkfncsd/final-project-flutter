@@ -26,4 +26,8 @@ class FavoriteService {
   Future<List<FavoriteViewModel>> getFavoriteViews() async {
     return await _favoriteRepo.getFavoriteViews();
   }
+  
+  Future<void> deleteFavoriteByHistoryId(int historyId) async {
+    await _favoriteRepo.deleteFavoriteByHistoryId(historyId);
+  }
 }

@@ -1,5 +1,6 @@
 import '../interface/Irepository.interface.dart';
 import '../model/favorite.model.dart';
+import '../model/favoriteView.model.dart';
 
 class FavoriteService {
   final IFavoriteRepo _favoriteRepo;
@@ -20,5 +21,13 @@ class FavoriteService {
 
   Future<void> deleteFavorite(int id) async {
     await _favoriteRepo.deleteFavorite(id);
+  }
+
+  Future<List<FavoriteViewModel>> getFavoriteViews() async {
+    return await _favoriteRepo.getFavoriteViews();
+  }
+  
+  Future<void> deleteFavoriteByHistoryId(int historyId) async {
+    await _favoriteRepo.deleteFavoriteByHistoryId(historyId);
   }
 }

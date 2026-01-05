@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_data/emergency_Data.dart';
 import '../../animations/search_transition_Animation.dart';
+import '../../domain/model/emergencyView.model.dart';
+import '../screen/quiz_Screen.dart';
 
 class SearchEmergencyScreen extends StatefulWidget {
-  const SearchEmergencyScreen({super.key});
+  final List<EmergencyViewModel> emergencies;
+  const SearchEmergencyScreen({super.key,required this.emergencies});
 
   @override
   State<SearchEmergencyScreen> createState() => _SearchEmergencyScreenState();
@@ -11,126 +13,45 @@ class SearchEmergencyScreen extends StatefulWidget {
 
 class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, dynamic>> _filteredEmergencies = [];
-
+  late List<EmergencyViewModel> _filteredEmergencies = [];
   @override
   void initState() {
     super.initState();
-    _filteredEmergencies = List.from(EmergencyData.allEmergencies);
+    _filteredEmergencies = widget.emergencies;
     _searchController.addListener(_filterEmergencies);
   }
 
+  List<EmergencyViewModel> searchEmergency(String query){
+    return widget.emergencies.where((emergency) {
+      final titleLower = emergency.name.toLowerCase();
+      final categoryLower = widget.emergencies.firstWhere((e) => e.categoryId == emergency.categoryId).name.toLowerCase();
+      final searchLower = query.toLowerCase();
+      return titleLower.contains(searchLower) || categoryLower.contains(searchLower);
+    }).toList();
+  }
   void _filterEmergencies() {
     final query = _searchController.text.trim();
     setState(() {
-      _filteredEmergencies = EmergencyData.searchEmergencies(query);
+      _filteredEmergencies = searchEmergency(query);
     });
   }
 
   void _clearSearch() {
     setState(() {
       _searchController.clear();
-      _filteredEmergencies = List.from(EmergencyData.allEmergencies);
+      _filteredEmergencies = widget.emergencies;
     });
   }
 
-  void _onEmergencyTap(Map<String, dynamic> emergency) {
-    // Navigate to emergency detail screen with smooth transition
+  void _onEmergencyTap(EmergencyViewModel emergency) {
     Navigator.of(context).push(
       SearchTransition.createRoute(
-        Scaffold(
-          appBar: AppBar(
-            title: Text(
-              emergency['title'] as String,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            backgroundColor: Colors.red,
-            elevation: 1,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
-          backgroundColor: Colors.grey[50],
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          child: Icon(
-                            emergency['icon'] as IconData,
-                            size: 50,
-                            color: Colors.red,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          emergency['title'] as String,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            emergency['category'] as String,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Content
-                  const Text(
-                    'First Aid Instructions',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
+        QuizScreen(emergency: emergency),
+      )
     );
   }
+  
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -234,7 +155,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
     );
   }
 
-  Widget _buildEmergencyCard(Map<String, dynamic> emergency) {
+  Widget _buildEmergencyCard(EmergencyViewModel emergency) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
@@ -260,7 +181,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
-                  emergency['icon'] as IconData,
+                  emergency.icon,
                   color: Colors.red,
                   size: 24,
                 ),
@@ -271,7 +192,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      emergency['title'] as String,
+                      emergency.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -280,7 +201,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      emergency['category'] as String,
+                      emergency.categoryName,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],

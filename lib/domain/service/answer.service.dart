@@ -13,4 +13,7 @@ class AnswerService {
   Future<Answer?> getAnswerById(int id) async {
     return await _answerRepo.getById(id);
   }
+  Future<List<Answer>> getAnswersByHistoryId(int historyId) async {
+    return await _answerRepo.getAnswersByHistoryId(historyId);
+  }
 }

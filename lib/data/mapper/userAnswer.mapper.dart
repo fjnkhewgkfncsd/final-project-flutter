@@ -11,7 +11,6 @@ class UserAnswerMapper {
   }
   static UserAnswerEntity toEntity(UserAnswer domain) {
     return UserAnswerEntity(
-      id: domain.id,
       answerId: domain.answerId,
       quizId: domain.quizId,
       historyId: domain.historyId,

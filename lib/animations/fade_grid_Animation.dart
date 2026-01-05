@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import '../domain/model/emergencyView.model.dart';
+import '../domain/model/category.model.dart';
 
 class FadeGridAnimation extends StatelessWidget {
+  final List<Category> categories;
   final String selectedFilter;
-  final List<Map<String, dynamic>> emergencies;
-  final Function(String, IconData, String) onEmergencyTap;
+  final List<EmergencyViewModel> emergencies;
+  final Function(EmergencyViewModel) onEmergencyTap;
+
+  
 
   const FadeGridAnimation({
     Key? key,
     required this.selectedFilter,
     required this.emergencies,
     required this.onEmergencyTap,
+    required this.categories,
   }) : super(key: key);
 
+  String getcategoryName(EmergencyViewModel emergency){
+    return categories.firstWhere((category) => category.categoryId == emergency.categoryId).categoryName;
+  }
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
@@ -32,23 +41,21 @@ class FadeGridAnimation extends StatelessWidget {
         childAspectRatio: 1.3,
         children: emergencies.map((emergency) {
           return _buildEmergencyCard(
-            emergency['title'] as String,
-            emergency['icon'] as IconData,
-            emergency['category'] as String,
+            emergency
           );
         }).toList(),
       ),
     );
   }
 
-  Widget _buildEmergencyCard(String title, IconData icon, String category) {
+  Widget _buildEmergencyCard(EmergencyViewModel emergency) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
-        onTap: () => onEmergencyTap(title, icon, category),
+        onTap: () => onEmergencyTap(emergency),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -62,11 +69,11 @@ class FadeGridAnimation extends StatelessWidget {
                   color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                child: Icon(icon, size: 28, color: Colors.red),
+                child: Icon(emergency.icon, size: 28, color: Colors.red),
               ),
               const SizedBox(height: 8),
               Text(
-                title,
+                emergency.name,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
@@ -77,7 +84,7 @@ class FadeGridAnimation extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                category,
+                emergency.categoryName,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 10,

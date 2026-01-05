@@ -37,4 +37,14 @@ class UserAnswerController {
     );
     return maps.map((map) => UserAnswerEntity.fromMap(map)).toList();
   }
+
+  Future<List<UserAnswerEntity>> getAllUserAnswersByHistoryId(int historyId) async {
+    final db = await _databaseService.database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT a.*
+      from userAnswer a
+      WHERE historyId = ?
+    ''', [historyId]);
+    return maps.map((map) => UserAnswerEntity.fromMap(map)).toList();
+  }
 }

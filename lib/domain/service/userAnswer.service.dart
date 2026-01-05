@@ -14,6 +14,9 @@ class UserAnswerService {
     return await _userAnswerRepo.getUserAnswersByHistoryId(historyId);
   }
   Future<void> insertUserAnswer(UserAnswer userAnswer) async {
-    await _userAnswerRepo.insertUserAnswer(userAnswer);
+    _userAnswerRepo.insertUserAnswer(userAnswer);
+  }
+  Future<List<UserAnswer>> getAllUserAnswersByHistoryId(int historyId) async {
+    return await _userAnswerRepo.getAllUserAnswersByHistoryId(historyId);
   }
 }

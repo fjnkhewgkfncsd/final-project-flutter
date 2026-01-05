@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../animations/fade_grid_Animation.dart';
-import '../../data/mock_data/emergency_Data.dart';
+import '../../domain/model/category.model.dart';
+import '../../domain/model/emergency.model.dart';
+import '../../domain/model/emergencyView.model.dart';
 // Import the QuizScreen
 import '../../ui/screen/quiz_Screen.dart'; // You'll need to create this
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key});
+  final List<Category> categories;
+  final List<EmergencyViewModel> emergencies;
+  const HomeTab({super.key,required this.categories, required this.emergencies});
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -14,71 +18,27 @@ class HomeTab extends StatefulWidget {
 class _HomeTabState extends State<HomeTab> {
   String _selectedFilter = 'ALL';
   
-  List<Map<String, dynamic>> get _filteredEmergencies {
-    return EmergencyData.getFilteredEmergencies(_selectedFilter);
+  List<String> get _filterOptions {
+    List<String> options = ['ALL'];
+    options.addAll(widget.categories.map((category) => category.categoryName));
+    return options;
+  }
+  List<EmergencyViewModel> get _filteredEmergencies {
+    if(_selectedFilter == 'ALL') {
+      return widget.emergencies;
+    } else {
+      return widget.emergencies.where((emergency) => emergency.categoryId == widget.categories.firstWhere((category) => category.categoryName == _selectedFilter).categoryId).toList();
+    }
   }
   
-  void _onEmergencyTap(String title, IconData icon, String category) {
-    // Check if it's Burns to show quiz screen
-    if (title == 'Burns') {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => QuizScreen(
-            emergencyTitle: title,
-            emergencyIcon: icon,
-            emergencyCategory: category,
-          ),
+  void _onEmergencyTap(EmergencyViewModel emergency) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QuizScreen(
+          emergency:emergency
         ),
-      );
-    } else {
-      // For other emergencies, show the detail screen
-      // You can navigate to a detail screen here
-      print('Tapped: $title ($category)');
-      // Example: Navigate to a detail screen
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Scaffold(
-            appBar: AppBar(
-              title: Text(title),
-              backgroundColor: Colors.red,
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(icon, size: 80, color: Colors.red),
-                  const SizedBox(height: 20),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    category,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      'First aid instructions would appear here...',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
+      )
+    );
   }
 
   @override
@@ -95,7 +55,6 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
         ),
-
         // Dropdown Filter
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -123,7 +82,7 @@ class _HomeTabState extends State<HomeTab> {
                           _selectedFilter = newValue!;
                         });
                       },
-                      items: EmergencyData.allFilters.map<DropdownMenuItem<String>>((String value) {
+                      items: _filterOptions.map<DropdownMenuItem<String>>((value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value, style: const TextStyle(fontSize: 14)),
@@ -131,12 +90,11 @@ class _HomeTabState extends State<HomeTab> {
                       }).toList(),
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
         ),
-
         Padding(
           padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
           child: Text(
@@ -155,6 +113,7 @@ class _HomeTabState extends State<HomeTab> {
             selectedFilter: _selectedFilter,
             emergencies: _filteredEmergencies,
             onEmergencyTap: _onEmergencyTap,
+            categories: widget.categories,
           ),
         ),
       ],

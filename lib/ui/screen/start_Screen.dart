@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import '../../animations/startScreen_Animation.dart';
 import 'home_Screen.dart';
 
-class StartScreen extends StatefulWidget {
-  const StartScreen({Key? key}) : super(key: key);
+class StartScreen extends StatelessWidget {
+  const StartScreen({super.key});
 
-  @override
-  State<StartScreen> createState() => _StartScreenState();
-}
-
-class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
     return StartScreenAnimation(
@@ -34,7 +29,6 @@ class _StartScreenState extends State<StartScreen> {
               ),
               const SizedBox(height: 30),
               // App Title
-             
             ],
           ),
         ),

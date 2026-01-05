@@ -19,7 +19,7 @@ class DataBaseService {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 5,
       onCreate: (db, version) async {
         await _onCreate(db, version);
         await SeedData().seedInitialData(db);
@@ -34,10 +34,19 @@ class DataBaseService {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
+      CREATE TABLE category(
+        categoryId INTEGER PRIMARY KEY AUTOINCREMENT,
+        categoryName TEXT
+      )
+    ''');
+
+    await db.execute('''
       CREATE TABLE emergency(
         emergencyId INTEGER PRIMARY KEY AUTOINCREMENT,
         emergencyName TEXT,
-        emergencyImage TEXT,
+        categoryId INTEGER,
+        emergencyIcon TEXT,
+        FOREIGN KEY (categoryId) REFERENCES category(categoryId) ON DELETE CASCADE
       )
     ''');
 
@@ -45,7 +54,9 @@ class DataBaseService {
       CREATE TABLE quiz(
         quizId INTEGER PRIMARY KEY AUTOINCREMENT,
         emergencyId INTEGER,
+        startQuestion INTEGER,
         FOREIGN KEY (emergencyId) REFERENCES emergency(emergencyId) ON DELETE CASCADE,
+        FOREIGN KEY (startQuestion) REFERENCES question(questionId) ON DELETE CASCADE
       ) 
     ''');
 
@@ -93,19 +104,19 @@ class DataBaseService {
     ''');
 
     await db.execute('''
-      CREATE TABLE history(
+      CREATE TABLE history (
         historyId INTEGER PRIMARY KEY AUTOINCREMENT,
         quizId INTEGER,
-        timestamp current_timestamp,
-        FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE,
-      )
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE
+      );
     ''');
 
     await db.execute('''
-      CREATE TABLE favorite_emergency(
-        favoriteEmergencyId INTEGER PRIMARY KEY AUTOINCREMENT,
-        emergencyId INTEGER,
-        FOREIGN KEY (emergencyId) REFERENCES emergency(emergencyId) ON DELETE CASCADE,
+      CREATE TABLE favorite(
+        favoriteId INTEGER PRIMARY KEY AUTOINCREMENT,
+        historyId INTEGER,
+        FOREIGN KEY (historyId) REFERENCES history(historyId) ON DELETE CASCADE
       )
     ''');
   }

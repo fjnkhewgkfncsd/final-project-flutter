@@ -49,6 +49,7 @@ class FadeGridAnimation extends StatelessWidget {
   }
 
   Widget _buildEmergencyCard(EmergencyViewModel emergency) {
+    print(emergency.icon);
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(

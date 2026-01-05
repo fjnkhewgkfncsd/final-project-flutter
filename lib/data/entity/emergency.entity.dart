@@ -21,10 +21,23 @@ class EmergencyEntity {
     );
   }
   static IconData toIconData(String iconString){
-    if(iconString == 'fire_truck'){
-      return Icons.fire_truck;
-    }else{
-      return Icons.local_hospital;
+    if(iconString == 'local_fire_department'){
+      return Icons.local_fire_department;
+    }else if(iconString == 'air'){
+      return Icons.air;
+    }else if(iconString == 'heart_broken'){
+      return Icons.heart_broken;
+    }else if(iconString == 'science'){
+      return Icons.science;
+    }else if(iconString == 'flash_on'){
+      return Icons.flash_on;
+    }else if(iconString == 'bloodtype'){
+      return Icons.bloodtype;
+    }else if(iconString == 'healing'){
+      return Icons.healing;
+    }else if(iconString == 'directions_boat'){
+      return Icons.directions_boat;
     }
+    return Icons.help; // Default icon if no match found
   }
 }

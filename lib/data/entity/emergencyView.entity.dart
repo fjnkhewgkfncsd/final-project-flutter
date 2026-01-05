@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../entity/emergency.entity.dart';
 class EmergencyViewEntity {
   final int id;
   final String name;
@@ -18,16 +19,9 @@ class EmergencyViewEntity {
     return EmergencyViewEntity(
       id: map['emergencyId'],
       name: map['emergencyName'],
-      icon: toIconData(map['emergencyIcon']),
+      icon: EmergencyEntity.toIconData(map['emergencyIcon']),
       categoryId: map['categoryId'],
       categoryName: map['categoryName'],
     );
-  }
-  static IconData toIconData(String iconString){
-    if(iconString == 'fire_truck'){
-      return Icons.fire_truck;
-    }else{
-      return Icons.local_hospital;
-    }
   }
 }

@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 class StartScreenAnimation extends StatefulWidget {
   final Widget child;
   final VoidCallback onAnimationComplete;
-  final Duration initialDelay;
   final Duration fadeOutDuration;
 
   const StartScreenAnimation({
     Key? key,
     required this.child,
     required this.onAnimationComplete,
-    this.initialDelay = const Duration(seconds: 1),
     this.fadeOutDuration = const Duration(milliseconds: 800),
   }) : super(key: key);
 
@@ -46,9 +44,6 @@ class _StartScreenAnimationState extends State<StartScreenAnimation>
   }
 
   void _startAnimationSequence() async {
-    // Wait for initial delay (1 second)
-    await Future.delayed(widget.initialDelay);
-    
     // Start fade out animation
     if (mounted) {
       await _controller.forward();

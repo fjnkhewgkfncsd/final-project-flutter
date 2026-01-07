@@ -38,6 +38,6 @@ class EmergencyEntity {
     }else if(iconString == 'directions_boat'){
       return Icons.directions_boat;
     }
-    return Icons.help; // Default icon if no match found
+    return Icons.help;
   }
 }

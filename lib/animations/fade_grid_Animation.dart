@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../domain/model/emergencyView.model.dart';
+import '../domain/model/emergency.model.dart';
 import '../domain/model/category.model.dart';
 
 class FadeGridAnimation extends StatelessWidget {
   final List<Category> categories;
   final String selectedFilter;
-  final List<EmergencyViewModel> emergencies;
-  final Function(EmergencyViewModel) onEmergencyTap;
+  final List<Emergency> emergencies;
+  final Function(Emergency) onEmergencyTap;
 
   
 
@@ -18,8 +18,8 @@ class FadeGridAnimation extends StatelessWidget {
     required this.categories,
   }) : super(key: key);
 
-  String getcategoryName(EmergencyViewModel emergency){
-    return categories.firstWhere((category) => category.categoryId == emergency.categoryId).categoryName;
+  String getcategoryName(Emergency emergency){
+    return categories.firstWhere((category) => category.categoryId == emergency.category.categoryId).categoryName;
   }
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class FadeGridAnimation extends StatelessWidget {
     );
   }
 
-  Widget _buildEmergencyCard(EmergencyViewModel emergency) {
+  Widget _buildEmergencyCard(Emergency emergency) {
     print(emergency.icon);
     return Card(
       elevation: 3,
@@ -85,7 +85,7 @@ class FadeGridAnimation extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                emergency.categoryName,
+                emergency.category.categoryName,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 10,

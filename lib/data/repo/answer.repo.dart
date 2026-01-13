@@ -1,26 +1,26 @@
 import '../../domain/interface/Irepository.interface.dart';
-import '../mapper/answer.mapper.dart';
-import '../service/controller/answer.controller.dart';
-import '../../domain/model/answer.model.dart';
+import '../mapper/choice.mapper.dart';
+import '../service/controller/choice.controller.dart';
+import '../../domain/model/choice.model.dart';
 
 class AnswerRepoImpl implements IAnswerRepo {
   final AnswerController _answerController = AnswerController();
 
   @override
-  Future<Answer?> getById(int id) async {
+  Future<Choice?> getById(int id) async {
     final result = await _answerController.getAnswerById(id);
-    return result == null ? null : AnswerMapper.toDomain(result);
+    return result == null ? null : ChoiceMapper.toDomain(result);
   }
 
   @override
-  Future<List<Answer>> getAnswersByQuestionId(int questionId) async {
+  Future<List<Choice>> getAnswersByQuestionId(int questionId) async {
     final results = await _answerController.getAnswersByQuestionId(questionId);
-    return results.map((entity) => AnswerMapper.toDomain(entity)).toList();
+    return results.map((entity) => ChoiceMapper.toDomain(entity)).toList();
   }
 
   @override
-  Future<List<Answer>> getAnswersByHistoryId(int historyId) async {
+  Future<List<Choice>> getAnswersByHistoryId(int historyId) async {
     final results = await _answerController.getAnswersByHistoryId(historyId);
-    return results.map((entity) => AnswerMapper.toDomain(entity)).toList();
+    return results.map((entity) => ChoiceMapper.toDomain(entity)).toList();
   }
 }

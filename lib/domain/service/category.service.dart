@@ -6,7 +6,7 @@ class CategoryService {
 
   CategoryService(this._categoryRepo);
 
-  Future<List<Category>> getAllCategories() async {
+  Future<List<Category>> getAllCategoriesWithEmergencies() async {
     return await _categoryRepo.getAllCategories();
   }
 

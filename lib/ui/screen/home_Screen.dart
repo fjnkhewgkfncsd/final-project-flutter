@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:project/domain/model/emergencyView.model.dart';
 import '../tab/favorite_Tab.dart';
 // import '../tab/history_Tab.dart';
 import '../tab/home_Tab.dart';
 import '../../ui/screen/search_Emergency.dart';
 import '../../animations/search_transition_Animation.dart';
-import '../../domain/service/emergency.service.dart';
 import '../screen/start_Screen.dart';
-import '../../data/repo/emergency.repo.dart';
 import '../../domain/service/category.service.dart';
 import '../../data/repo/category.repo.dart';
 import '../../domain/model/category.model.dart';
@@ -24,29 +21,23 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
   int _currentIndex = 0;
 
-  late final EmergencyService _emergencyService;
   late final CategoryService _categoryService;
 
-  late List<EmergencyViewModel> _emergencies;
   late List<Category> _categories;
 
-  late final FavoriteTab favoriteTab;
-  late final FavoriteTab historyTab;
 
   @override
   void initState() {
     super.initState();
-    _emergencyService = EmergencyService(EmergencyRepoImpl());
     _categoryService = CategoryService(CategoryRepoImpl());
-    favoriteTab = FavoriteTab(isActive: _currentIndex == 1,);
-    historyTab = FavoriteTab(tabName: 'history', isActive: _currentIndex == 2); 
     _loadData();
   }
 
   Future<void> _loadData() async {
-    _emergencies = await _emergencyService.getAllEmergencyViews();
-    _categories = await _categoryService.getAllCategories();
-
+    _categories = await _categoryService.getAllCategoriesWithEmergencies();
+    if(!mounted){
+      return;
+    } 
     setState(() {
       isLoading = false;
     });
@@ -55,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToSearch() {
     Navigator.of(context).push(
       SearchTransition.createRoute(
-        SearchEmergencyScreen(emergencies: _emergencies),
+        SearchEmergencyScreen(emergencies: _categories.expand((cat) => cat.emergencies).toList()),
       ),
     );
   }
@@ -110,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
         HomeTab(
           key: const PageStorageKey('home'),
           categories: _categories,
-          emergencies: _emergencies,
+          emergencies: _categories.expand((cat) => cat.emergencies).toList(),
         ),
         FavoriteTab(
           key: const PageStorageKey('favorite'),

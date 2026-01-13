@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../domain/model/question.model.dart';
 import '../widget/choiceButton.widget.dart';
+import '../../domain/model/choice.model.dart';
 
 class QuestionWidget extends StatelessWidget {
   final Question question;
-  final void Function(int answerId) returnAnswerId;
+  final void Function(Choice choice) returnAnswerId;
 
   const QuestionWidget({
     super.key,
@@ -12,8 +13,8 @@ class QuestionWidget extends StatelessWidget {
     required this.returnAnswerId,
   });
 
-  void onAnswerSelected(int answerId) {
-    returnAnswerId(answerId);
+  void onAnswerSelected(Choice choice) {
+    returnAnswerId(choice);
   }
 
   @override
@@ -35,10 +36,10 @@ class QuestionWidget extends StatelessWidget {
                 ),
               ),
               SizedBox(height:30),
-              ...question.answers.map(
-                (answer) => ChoiceButton(
-                  answer: answer,
-                  onPressed: () => onAnswerSelected(answer.answerId),
+              ...question.choices.map(
+                (choice) => ChoiceButton(
+                  answer: choice,
+                  onPressed: () => onAnswerSelected(choice),
                 ),
               ),
             ],

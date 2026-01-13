@@ -4,12 +4,9 @@ import '../widget/customizeButton.widget.dart';
 import '../screen/home_Screen.dart';
 import '../../domain/service/favorite.service.dart';
 import '../../data/repo/favorite.repo.dart';
-import '../../domain/model/favorite.model.dart';
 import '../../data/repo/answer.repo.dart';
 import '../../domain/service/answer.service.dart';
-import '../../data/repo/userAnswer.repo.dart';
-import '../../domain/service/userAnswer.service.dart';
-import '../../domain/model/answer.model.dart';
+import '../../domain/model/choice.model.dart';
 import '../../domain/model/userAnswer.model.dart';
 
 
@@ -26,10 +23,9 @@ class EmergencyActionScreen extends StatefulWidget {
 class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
   final FavoriteService _favoriteService = FavoriteService(FavoriteRepoImpl());
   final AnswerService _answerService = AnswerService(AnswerRepoImpl());
-  final UserAnswerService _userAnswerService = UserAnswerService(UserAnswerRepoImpl());
 
   bool isFav = false;
-  List<Answer> answers = [];
+  List<Choice> answers = [];
   List<UserAnswer> userAnswers = [];
   bool isLoading = false;
 
@@ -50,20 +46,15 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
       isLoading = true;
     });
     answers = await _answerService.getAnswersByHistoryId(widget.historyId);
-    userAnswers = await _userAnswerService.getAllUserAnswersByHistoryId(widget.historyId);
     setState((){
       isLoading = false;
     });
   }
 
   EmergencyAction getEmergencyAction(){
-    for(var userAnswer in userAnswers){
-      for(var answer in answers){
-        if(answer.answerId == userAnswer.answerId){
-          if(answer.emergencyAction != null){
-            return answer.emergencyAction!;
-          }
-        }
+    for(var answer in answers){
+      if(answer.emergencyAction != null){
+        return answer.emergencyAction!;
       }
     }
     return EmergencyAction(
@@ -101,11 +92,10 @@ class _EmergencyActionScreenState extends State<EmergencyActionScreen> {
       ),
       (route) => false,
     );
-
   }
 
   void onAddtoFavorites(){
-    _favoriteService.addFavorite(Favorite(historyId: widget.historyId));
+    _favoriteService.addFavorite(widget.historyId);
   }
 
   void toggleFavorite(){

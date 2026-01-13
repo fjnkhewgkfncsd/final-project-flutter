@@ -1,6 +1,6 @@
 import '../../entity/question.entity.dart';
 import '../db/database.service.dart';
-import '../../entity/answer.entity.dart';
+import '../../entity/choice.entity.dart';
 class QuestionController {
   final DataBaseService _databaseService = DataBaseService();
 
@@ -31,8 +31,8 @@ class QuestionController {
       );
     });
 
-    questions[qId]!.answers.add(
-      AnswerEntity.fromMap(
+    questions[qId]!.choices.add(
+      ChoiceEntity.fromMap(
         row
       )
     );

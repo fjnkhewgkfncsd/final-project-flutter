@@ -1,14 +1,13 @@
 import '../entity/question.entity.dart';
 import '../../domain/model/question.model.dart';
-import './answer.mapper.dart';
+import 'choice.mapper.dart';
 
 class QuestionMapper{
   static Question toDomain(QuestionEntity entity){
     return Question(
       questionId: entity.questionId,
       questionTitle: entity.questionTitle,
-      quizId: entity.quizId,
-      answers: entity.answers.map((aEntity) => AnswerMapper.toDomain(aEntity)).toList(),
+      choices: entity.choices.map((aEntity) => ChoiceMapper.toDomain(aEntity)).toList(),
     );
   }
 
@@ -16,8 +15,7 @@ class QuestionMapper{
     return QuestionEntity(
       questionId: domain.questionId,
       questionTitle: domain.questionTitle,
-      quizId: domain.quizId,
-      answers: domain.answers.map((aDomain) => AnswerMapper.toEntity(aDomain)).toList(),
+      choices: domain.choices.map((aDomain) => ChoiceMapper.toEntity(aDomain)).toList(),
     );
   }
 }

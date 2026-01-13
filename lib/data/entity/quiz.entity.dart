@@ -1,14 +1,12 @@
 import './question.entity.dart';
-import './answer.entity.dart';
+import 'choice.entity.dart';
 class QuizEntity{
   final int id;
-  final int emergencyId;
   final List<QuestionEntity> questions;
   final int startQuestionId;
 
   const QuizEntity({
     required this.id,
-    required this.emergencyId,
     required this.startQuestionId,
     this.questions = const [],
   });
@@ -16,8 +14,7 @@ class QuizEntity{
   factory QuizEntity.fromMap(Map<String, dynamic> map) {
     return QuizEntity(
       id: map['quizId'] as int,
-      emergencyId: map['emergencyId'] as int,
-      startQuestionId: map['startQuestionId'] as int,
+      startQuestionId: map['startQuestion'] as int,
       questions: [],
     );
   }
@@ -25,24 +22,23 @@ class QuizEntity{
   factory QuizEntity.fromMapWithQuestions(List<Map<String, dynamic>> rows) {
     final Map<int,QuestionEntity> questions = {};
     for (final row in rows) {
-    final qId = row['questionId'] as int;
-    questions.putIfAbsent(qId, () {
-      return QuestionEntity.fromMap(
-        row
-      );
-    });
+      final qId = row['questionId'] as int;
+      questions.putIfAbsent(qId, () {
+        return QuestionEntity.fromMap(
+          row
+        );
+      });
 
-    questions[qId]!.answers.add(
-      AnswerEntity.fromMap(
-        row
-      )
-    );
-  }
+      questions[qId]!.choices.add(
+        ChoiceEntity.fromMap(
+          row
+        )
+      );
+    }
 
   return QuizEntity(
     id: rows.first['quizId'] as int,
     startQuestionId: rows.first['startQuestion'] as int,
-    emergencyId: rows.first['emergencyId'] as int,
     questions: questions.values.toList(),
   );
   }

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import './category.entity.dart';
+import './quiz.entity.dart';
 class EmergencyEntity {
   final int id;
   final String name;
   final IconData icon;
-  final int categoryId;
+  late final CategoryEntity category;
+  final QuizEntity? quiz;
 
-  const EmergencyEntity({
+  EmergencyEntity({
     required this.id,
     required this.name,
     required this.icon,
-    required this.categoryId,
+    required this.quiz,
   });
 
   factory EmergencyEntity.fromMap(Map<String, dynamic> map) {
@@ -17,9 +20,30 @@ class EmergencyEntity {
       id: map['emergencyId'],
       name: map['emergencyName'],
       icon: toIconData(map['emergencyIcon']),
-      categoryId: map['categoryId'],
+      quiz: map['quizId'] != null ? QuizEntity.fromMap(map) : null,
     );
   }
+
+  factory EmergencyEntity.fromMapWithCategory(Map<String, dynamic> map) {
+    EmergencyEntity emergency;
+    if(map['categoryId'] != null){
+      emergency = EmergencyEntity(
+        id: map['emergencyId'],
+        name: map['emergencyName'],
+        icon: toIconData(map['emergencyIcon']),
+        quiz: map['quizId'] != null ? QuizEntity.fromMap(map) : null,
+      );
+      emergency.category = CategoryEntity.fromMap(map);
+      return emergency;
+    }
+    return EmergencyEntity(
+      id: map['emergencyId'],
+      name: map['emergencyName'],
+      icon: toIconData(map['emergencyIcon']),
+      quiz: map['quizId'] != null ? QuizEntity.fromMap(map) : null,
+    );
+  }
+  
   static IconData toIconData(String iconString){
     if(iconString == 'local_fire_department'){
       return Icons.local_fire_department;

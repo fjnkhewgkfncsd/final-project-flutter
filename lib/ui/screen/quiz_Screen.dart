@@ -5,7 +5,6 @@ import '../../data/repo/quiz.repo.dart';
 import '../../domain/model/quiz.model.dart';
 
 import '../screen/start_Screen.dart';
-import '../../domain/model/emergencyView.model.dart';
 
 import '../widget/question.widget.dart';
 import '../../domain/model/question.model.dart';
@@ -18,11 +17,11 @@ import '../../domain/service/history.service.dart';
 import '../../domain/model/userAnswer.model.dart';
 import '../../domain/service/userAnswer.service.dart';
 import '../../data/repo/userAnswer.repo.dart';
-
-import '../../domain/model/answer.model.dart';
+import '../../domain/model/emergency.model.dart';
+import '../../domain/model/choice.model.dart';
 
 class QuizScreen extends StatefulWidget {
-  final EmergencyViewModel emergency;
+  final Emergency emergency;
 
   const QuizScreen({
     super.key,
@@ -34,7 +33,7 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  final List<int> userAnswers = [];
+  final List<Choice> userAnswers = [];
 
   late final QuizService _quizService;
   late Quiz _quiz;
@@ -46,11 +45,9 @@ class _QuizScreenState extends State<QuizScreen> {
   final HistoryService _historyService =
       HistoryService(HistoryRepoImpl());
 
-  final UserAnswerService _userAnswerService =
-      UserAnswerService(UserAnswerRepoImpl());
+  final UserAnswerService _userAnswerService = UserAnswerService(UserAnswerRepoImpl());
 
-  Quiz get defaultQuiz =>
-      Quiz(id: 0, startQuestionId: 0, emergencyId: 0, questions: []);
+  Quiz get defaultQuiz => Quiz(id: 0, startQuestionId: 0, questions: []);
 
   @override
   void initState() {
@@ -76,14 +73,14 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Answer getAnswerById(int answerId) {
+  Choice getAnswerById(int answerId) {
     return _quiz.questions
-        .expand((q) => q.answers)
-        .firstWhere((a) => a.answerId == answerId);
+        .expand((q) => q.choices)
+        .firstWhere((a) => a.choiceId == answerId);
   }
 
   Future<int> insertHistory() async {
-    return await _historyService.addHistory(_quiz.id);
+    return await _historyService.addHistory(widget.emergency.id);
   }
 
   Future<void> insertUserAnswersToDb(int historyId) async {
@@ -91,35 +88,29 @@ class _QuizScreenState extends State<QuizScreen> {
       await _userAnswerService.insertUserAnswer(
         UserAnswer.toDB(
           historyId: historyId,
-          answerId: answerId,
-          quizId: _quiz.id,
+          choice: answerId,
         ),
       );
     }
   }
 
-  void addUserAnswer(int answerId) async {
-    userAnswers.add(answerId);
-
-    final selectedAnswer = getAnswerById(answerId);
-    final nextQuestionId = selectedAnswer.nextQuestionId;
-
-    if (nextQuestionId == null) {
+  void addUserAnswer(Choice choice) async {
+    userAnswers.add(choice);
+    final nextQuestionId = choice.nextQuestionId;
+    if (nextQuestionId == null){
       final historyId = await insertHistory();
       await insertUserAnswersToDb(historyId);
-
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => EmergencyActionScreen(
             historyId: historyId,
             isFromQuiz: true,
-            emergency: selectedAnswer.emergencyAction!,
+            emergency: choice.emergencyAction!,
           ),
         ),
       );
       return;
     }
-
     setState(() {
       currentQuestionId = nextQuestionId;
     });

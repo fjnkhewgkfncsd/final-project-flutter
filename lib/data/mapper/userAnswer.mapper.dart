@@ -1,18 +1,17 @@
 import '../entity/userAnswer.entity.dart';
 import '../../domain/model/userAnswer.model.dart';
+import './choice.mapper.dart';
 class UserAnswerMapper {
   static UserAnswer toDomain(UserAnswerEntity entity) {
     return UserAnswer(
       id: entity.id,
-      answerId : entity.answerId,
-      quizId : entity.quizId,
+      choice: ChoiceMapper.toDomain(entity.choice),
       historyId : entity.historyId,
     );
   }
   static UserAnswerEntity toEntity(UserAnswer domain) {
     return UserAnswerEntity(
-      answerId: domain.answerId,
-      quizId: domain.quizId,
+      choice: ChoiceMapper.toEntity(domain.choice),
       historyId: domain.historyId,
     );
   }

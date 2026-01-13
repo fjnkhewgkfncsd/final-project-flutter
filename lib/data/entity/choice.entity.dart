@@ -1,38 +1,34 @@
 import './emergencyAction.entity.dart';
-class AnswerEntity {
-  final int answerId;
-  final String answerTitle;
+class ChoiceEntity {
+  final int choiceId;
+  final String choiceTitle;
   final int? nextQuestionId;
   final EmergencyActionEntity? emergencyAction;
-  final int questionId;
 
-  const AnswerEntity({
-    required this.answerId,
-    required this.answerTitle,
+  const ChoiceEntity({
+    required this.choiceId,
+    required this.choiceTitle,
     this.nextQuestionId,
     this.emergencyAction,
-    required this.questionId,
   });
 
-  factory AnswerEntity.fromMap(Map<String, dynamic> map) {
+  factory ChoiceEntity.fromMap(Map<String, dynamic> map) {
     int? emergencyActionId = map['emergencyActionId'];
     String? emergencyActionTitle = map['actionTitle'];
     String? instructor = map['instruction'];
     String? level = map['LevelOfDanger'];
     if(emergencyActionId == null){
-      return AnswerEntity(
-        answerId: map['answerId'] as int,
-        answerTitle: map['answerTitle'] as String,
+      return ChoiceEntity(
+        choiceId: map['answerId'] as int,
+        choiceTitle: map['answerTitle'] as String,
         nextQuestionId: map['nextQuestionId'] as int?,
-        questionId: map['questionId'] as int,
       );
     }
-    return AnswerEntity(
-      answerId: map['answerId'] as int,
-      answerTitle: map['answerTitle'] as String,
+    return ChoiceEntity(
+      choiceId: map['answerId'] as int,
+      choiceTitle: map['answerTitle'] as String,
       nextQuestionId: map['nextQuestionId'] as int?,
       emergencyAction: EmergencyActionEntity(id: emergencyActionId, actionTitle: emergencyActionTitle!, instruction: instructor!, level: level!),
-      questionId: map['questionId'] as int,
     );
   }
 }

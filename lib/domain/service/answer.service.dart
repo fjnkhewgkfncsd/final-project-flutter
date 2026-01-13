@@ -1,19 +1,19 @@
 import '../interface/Irepository.interface.dart';
-import '../model/answer.model.dart';
+import '../model/choice.model.dart';
 
 class AnswerService {
   final IAnswerRepo _answerRepo;
 
   AnswerService(this._answerRepo);
 
-  Future<List<Answer>> getAllAnswers(int id) async {
+  Future<List<Choice>> getAllAnswers(int id) async {
     return await _answerRepo.getAnswersByQuestionId(id);
   }
 
-  Future<Answer?> getAnswerById(int id) async {
+  Future<Choice?> getAnswerById(int id) async {
     return await _answerRepo.getById(id);
   }
-  Future<List<Answer>> getAnswersByHistoryId(int historyId) async {
+  Future<List<Choice>> getAnswersByHistoryId(int historyId) async {
     return await _answerRepo.getAnswersByHistoryId(historyId);
   }
 }

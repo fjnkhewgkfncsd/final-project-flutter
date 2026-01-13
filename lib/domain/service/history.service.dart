@@ -1,6 +1,5 @@
 import '../interface/Irepository.interface.dart';
 import '../model/history.model.dart';
-import '../model/historyView.model.dart';
 
 class HistoryService {
   final IHistoryRepo _historyRepo;
@@ -18,8 +17,5 @@ class HistoryService {
   }
   Future<void> deleteHistory(int id) async {
     await _historyRepo.deleteHistory(id);
-  }
-  Future<List<HistoryViewModel>> getAllHistoryViews() async {
-    return await _historyRepo.getAllHistoryViews();
   }
 }

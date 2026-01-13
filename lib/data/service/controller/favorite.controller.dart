@@ -1,6 +1,5 @@
 import '../db/database.service.dart';
 import '../../entity/favorite.entity.dart';
-import '../../entity/favoriteView.entity.dart';
 
 class FavoriteService{
   final DataBaseService _databaseService = DataBaseService();
@@ -24,10 +23,10 @@ class FavoriteService{
     return result.map((map) => FavoriteEntity.fromMap(map)).toList();
   }
   
-  Future<int> insertFavorite(FavoriteEntity favorite) async {
+  Future<int> insertFavorite(int historyId) async {
     final db = await _databaseService.database;
     return await db.insert('favorite', {
-      'historyId': favorite.historyId,
+      'historyId': historyId,
     });
   }
 
@@ -49,17 +48,17 @@ class FavoriteService{
     );
   }
 
-  Future<List<FavoriteViewEntity>> getFavoriteViews()async {
+  Future<List<FavoriteEntity>> getFavoriteViews()async {
     final db = await _databaseService.database;
     final result = await db.rawQuery('''
-      SELECT f.favoriteId as id, h.historyId, e.emergencyIcon, e.emergencyName, h.timestamp, c.categoryName
+      SELECT f.*, h.*, e.*, c.*, ua.*
       FROM favorite f
       JOIN history h ON f.historyId = h.historyId
-      JOIN quiz q on h.quizId = q.quizId
-      JOIN emergency e on q.emergencyId = e.emergencyId
+      JOIN userAnswer ua on h.historyId = ua.historyId
+      JOIN emergency e on h.emergencyId = e.emergencyId
       JOIN category c on e.categoryId = c.categoryId
       ORDER BY h.timestamp DESC
     ''');
-    return result.map((map) => FavoriteViewEntity.fromMap(map)).toList();
+    return result.map((map) => FavoriteEntity.fromMap(map)).toList();
   }
 }

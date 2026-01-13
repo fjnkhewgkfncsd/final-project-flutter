@@ -8,8 +8,7 @@ class UserAnswerController {
     final db = await _databaseService.database;
     await db.insert(
       'userAnswer',{
-        'answerId': userAnswer.answerId,
-        'quizId': userAnswer.quizId,
+        'answerId': userAnswer.choice.choiceId,
         'historyId': userAnswer.historyId,
       },
     );

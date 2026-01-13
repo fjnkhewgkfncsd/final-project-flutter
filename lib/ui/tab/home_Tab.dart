@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../animations/fade_grid_Animation.dart';
 import '../../domain/model/category.model.dart';
-import '../../domain/model/emergencyView.model.dart';
-// Import the QuizScreen
-import '../../ui/screen/quiz_Screen.dart'; // You'll need to create this
+import '../../domain/model/emergency.model.dart';
+import '../../ui/screen/quiz_Screen.dart';
 
 class HomeTab extends StatefulWidget {
   final List<Category> categories;
-  final List<EmergencyViewModel> emergencies;
+  final List<Emergency> emergencies;
   const HomeTab({super.key,required this.categories, required this.emergencies});
 
   @override
@@ -22,15 +21,16 @@ class _HomeTabState extends State<HomeTab> {
     options.addAll(widget.categories.map((category) => category.categoryName));
     return options;
   }
-  List<EmergencyViewModel> get _filteredEmergencies {
+
+  List<Emergency> get _filteredEmergencies {
     if(_selectedFilter == 'ALL') {
       return widget.emergencies;
     } else {
-      return widget.emergencies.where((emergency) => emergency.categoryId == widget.categories.firstWhere((category) => category.categoryName == _selectedFilter).categoryId).toList();
+      return widget.emergencies.where((emergency) => emergency.category.categoryName == _selectedFilter).toList();
     }
   }
   
-  void _onEmergencyTap(EmergencyViewModel emergency) {
+  void _onEmergencyTap(Emergency emergency) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => QuizScreen(
@@ -105,7 +105,6 @@ class _HomeTabState extends State<HomeTab> {
             ),
           ),
         ),
-        
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: FadeGridAnimation(

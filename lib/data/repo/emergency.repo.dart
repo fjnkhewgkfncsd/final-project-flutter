@@ -2,8 +2,6 @@ import '../../domain/interface/Irepository.interface.dart';
 import '../mapper/emergency.mapper.dart';
 import '../service/controller/emergency.controller.dart';
 import '../../domain/model/emergency.model.dart';
-import '../../domain/model/emergencyView.model.dart';
-import '../mapper/emergencyView.mapper.dart';
 
 class EmergencyRepoImpl implements IEmergencyRepo {
   final EmergencyController _emergencyController = EmergencyController();
@@ -28,9 +26,4 @@ class EmergencyRepoImpl implements IEmergencyRepo {
         .toList();
   }
 
-  @override
-  Future<List<EmergencyViewModel>> getAllEmergencyViews() async {
-    final results = await _emergencyController.getAllEmergencyViews();
-    return results.map((entity) => EmergencyViewMapper.toViewModel(entity)).toList();
-  }
 }

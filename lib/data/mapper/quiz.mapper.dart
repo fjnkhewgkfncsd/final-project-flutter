@@ -7,7 +7,6 @@ class QuizMapper{
     return Quiz(
       id: entity.id,
       startQuestionId: entity.startQuestionId,
-      emergencyId: entity.emergencyId,
       questions: entity.questions.map((qEntity) => QuestionMapper.toDomain(qEntity)).toList(),
     );
   }
@@ -16,7 +15,6 @@ class QuizMapper{
     return QuizEntity(
       id: domain.id,
       startQuestionId: domain.startQuestionId,
-      emergencyId: domain.emergencyId,
       questions: domain.questions.map((qDomain) => QuestionMapper.toEntity(qDomain)).toList(),
     );
   }

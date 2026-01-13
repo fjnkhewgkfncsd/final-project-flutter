@@ -17,7 +17,7 @@ class CategoryRepoImpl implements ICategoryRepo {
 
   @override
   Future<List<Category>> getAllCategories() async {
-    final categoryEntities = await _categoryController.getAllCategories();
+    final categoryEntities = await _categoryController.getAllCategoriesWithEmergencies();
     return categoryEntities
         .map((entity) => CategoryMapper.toDomain(entity))
         .toList();

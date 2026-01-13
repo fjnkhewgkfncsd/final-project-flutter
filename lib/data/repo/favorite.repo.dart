@@ -2,8 +2,6 @@ import '../mapper/favorite.mapper.dart';
 import '../../domain/interface/Irepository.interface.dart';
 import '../service/controller/favorite.controller.dart';
 import '../../domain/model/favorite.model.dart';
-import '../../domain/model/favoriteView.model.dart';
-import '../mapper/favoriteView.mapper.dart';
 
 class FavoriteRepoImpl implements IFavoriteRepo{
   final FavoriteService _favoriteService = FavoriteService();
@@ -21,8 +19,8 @@ class FavoriteRepoImpl implements IFavoriteRepo{
   }
 
   @override
-  Future<int> insertFavorite(Favorite model) async {
-    return await _favoriteService.insertFavorite(FavoriteMapper.toEntity(model));
+  Future<int> insertFavorite(int model) async {
+    return await _favoriteService.insertFavorite(model);
   }
 
   @override
@@ -31,9 +29,9 @@ class FavoriteRepoImpl implements IFavoriteRepo{
   }
 
   @override
-  Future<List<FavoriteViewModel>> getFavoriteViews() async {
+  Future<List<Favorite>> getFavoriteViews() async {
     final result = await _favoriteService.getFavoriteViews();
-    return result.map((e) => FavoriteViewMapper.toDomain(e)).toList();
+    return result.map((e) => FavoriteMapper.toDomain(e)).toList();
   }
 
   @override

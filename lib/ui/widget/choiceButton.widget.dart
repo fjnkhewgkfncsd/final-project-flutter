@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../domain/model/answer.model.dart';
+import '../../domain/model/choice.model.dart';
 
 class ChoiceButton extends StatelessWidget {
   final VoidCallback onPressed;
-  final Answer answer;
+  final Choice answer;
 
   const ChoiceButton({
     super.key,
@@ -45,7 +45,7 @@ class ChoiceButton extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  answer.answerTitle,
+                  answer.choiceTitle,
                   textAlign: TextAlign.left,
                   style: const TextStyle(
                     fontSize: 18,

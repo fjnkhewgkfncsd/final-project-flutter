@@ -1,6 +1,5 @@
 import '../interface/Irepository.interface.dart';
 import '../model/emergency.model.dart';
-import '../model/emergencyView.model.dart';
 
 class EmergencyService {
   final IEmergencyRepo _emergencyRepo;
@@ -19,7 +18,4 @@ class EmergencyService {
     return await _emergencyRepo.getEmergenciesByCategoryId(categoryId);
   }
 
-  Future<List<EmergencyViewModel>> getAllEmergencyViews() async {
-    return await _emergencyRepo.getAllEmergencyViews();
-  }
 }

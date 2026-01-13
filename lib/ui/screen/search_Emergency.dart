@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../animations/search_transition_Animation.dart';
-import '../../domain/model/emergencyView.model.dart';
+import '../../domain/model/emergency.model.dart';
 import '../screen/quiz_Screen.dart';
 
 class SearchEmergencyScreen extends StatefulWidget {
-  final List<EmergencyViewModel> emergencies;
+  final List<Emergency> emergencies;
   const SearchEmergencyScreen({super.key,required this.emergencies});
 
   @override
@@ -13,7 +13,7 @@ class SearchEmergencyScreen extends StatefulWidget {
 
 class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
   final TextEditingController _searchController = TextEditingController();
-  late List<EmergencyViewModel> _filteredEmergencies = [];
+  late List<Emergency> _filteredEmergencies = [];
   @override
   void initState() {
     super.initState();
@@ -21,14 +21,14 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
     _searchController.addListener(_filterEmergencies);
   }
 
-  List<EmergencyViewModel> searchEmergency(String query){
+  List<Emergency> searchEmergency(String query){
     return widget.emergencies.where((emergency) {
       final titleLower = emergency.name.toLowerCase();
-      final categoryLower = widget.emergencies.firstWhere((e) => e.categoryId == emergency.categoryId).name.toLowerCase();
       final searchLower = query.toLowerCase();
-      return titleLower.contains(searchLower) || categoryLower.contains(searchLower);
+      return titleLower.contains(searchLower);
     }).toList();
   }
+
   void _filterEmergencies() {
     final query = _searchController.text.trim();
     setState(() {
@@ -43,7 +43,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
     });
   }
 
-  void _onEmergencyTap(EmergencyViewModel emergency) {
+  void _onEmergencyTap(Emergency emergency) {
     Navigator.of(context).push(
       SearchTransition.createRoute(
         QuizScreen(emergency: emergency),
@@ -155,7 +155,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
     );
   }
 
-  Widget _buildEmergencyCard(EmergencyViewModel emergency) {
+  Widget _buildEmergencyCard(Emergency emergency) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
@@ -201,7 +201,7 @@ class _SearchEmergencyScreenState extends State<SearchEmergencyScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      emergency.categoryName,
+                      emergency.category.categoryName,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],

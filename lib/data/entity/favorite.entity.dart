@@ -1,15 +1,20 @@
+import './history.entity.dart';
 class FavoriteEntity {
-  final int? id;
-  final int historyId;
+  final int? favId;
+  final HistoryEntity history;
 
   const FavoriteEntity({
-    required this.id,
-    required this.historyId,
+    required this.favId,
+    required this.history,
   });
+
   factory FavoriteEntity.fromMap(Map<String, dynamic> map) {
+    final HistoryEntity history =
+        HistoryEntity.fromMap(map, includeFavorite: false);
+
     return FavoriteEntity(
-      id: map['id'],
-      historyId: map['historyId'],
+      favId: map['favoriteId'] ?? map['id'],
+      history: history,
     );
   }
 }

@@ -16,10 +16,10 @@ class DataBaseService {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'FirstAidBuddyApp_database.db');
+    String path = join(await getDatabasesPath(), 'FirstAidBuddyApp_databaset2.db');
     return await openDatabase(
       path,
-      version: 4,
+      version: 1,
       onCreate: (db, version) async {
         await _onCreate(db, version);
         await SeedData().seedInitialData(db);
@@ -51,6 +51,15 @@ class DataBaseService {
     ''');
 
     await db.execute('''
+          CREATE TABLE question(
+            questionId INTEGER PRIMARY KEY AUTOINCREMENT,
+            quizId INTEGER,
+            questionTitle TEXT,
+            FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE
+          )
+        ''');
+
+    await db.execute('''
       CREATE TABLE quiz(
         quizId INTEGER PRIMARY KEY AUTOINCREMENT,
         emergencyId INTEGER,
@@ -58,15 +67,6 @@ class DataBaseService {
         FOREIGN KEY (emergencyId) REFERENCES emergency(emergencyId) ON DELETE CASCADE,
         FOREIGN KEY (startQuestion) REFERENCES question(questionId) ON DELETE CASCADE
       ) 
-    ''');
-
-    await db.execute('''
-      CREATE TABLE question(
-        questionId INTEGER PRIMARY KEY AUTOINCREMENT,
-        quizId INTEGER,
-        questionTitle TEXT,
-        FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE
-      )
     ''');
 
     await db.execute('''
@@ -96,19 +96,17 @@ class DataBaseService {
         userAnswerId INTEGER PRIMARY KEY AUTOINCREMENT,
         answerId INTEGER,
         historyId INTEGER,
-        quizId INTEGER,
         FOREIGN KEY (answerId) REFERENCES answer(answerId) ON DELETE CASCADE,
-        FOREIGN KEY (historyId) REFERENCES history(historyId) ON DELETE CASCADE,
-        FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE
+        FOREIGN KEY (historyId) REFERENCES history(historyId) ON DELETE CASCADE
       )
     ''');
 
     await db.execute('''
       CREATE TABLE history (
         historyId INTEGER PRIMARY KEY AUTOINCREMENT,
-        quizId INTEGER,
+        emergencyId INTEGER,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (quizId) REFERENCES quiz(quizId) ON DELETE CASCADE
+        FOREIGN KEY (emergencyId) REFERENCES emergency(emergencyId) ON DELETE CASCADE
       );
     ''');
 
@@ -125,10 +123,8 @@ class DataBaseService {
     await db.execute('CREATE INDEX idx_question_quiz ON question(quizId)');
     await db.execute('CREATE INDEX idx_answer_question ON answer(questionId)');
     await db.execute('CREATE INDEX idx_answer_action ON answer(emergencyActionId)');
-    await db.execute('CREATE INDEX idx_userAnswer_quiz ON userAnswer(quizId)');
     await db.execute('CREATE INDEX idx_userAnswer_history ON userAnswer(historyId)');
     await db.execute('CREATE INDEX idx_userAnswer_answer ON userAnswer(answerId)');
-    await db.execute('CREATE INDEX idx_history_quiz ON history(quizId)');
     await db.execute('CREATE INDEX idx_favorite_history ON favorite(historyId)');
   }
 }

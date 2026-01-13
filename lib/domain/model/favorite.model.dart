@@ -1,9 +1,10 @@
+import './history.model.dart';
 class Favorite {
   final int? id;
-  final int historyId;
+  final History history;
 
   const Favorite({
     this.id,
-    required this.historyId,
+    required this.history,
   });
 }
